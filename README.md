@@ -57,6 +57,33 @@ Tests (drivers, engine, recommender, API, and both saved-flow baselines):
   - Missing rules, explicit deny rules, a disabled rule, and NAT/BGP that the model flags as not modeled.
 - **lab1** (4 devices): a minimal regression lab with its own planted bugs, including asymmetry, a routing loop and a blackhole.
 
+### Real device data (`real-*` snapshots)
+
+Imported from [batfish/lab-validation](https://github.com/batfish/lab-validation) (Apache-2.0). These are configs, routing tables and traffic tests captured from real device images. Each folder's `SOURCE.md` names the original lab.
+
+| Snapshot | What it is | Checked against |
+|---|---|---|
+| `real-fortigate-policy` | FortiGate between inside and outside hosts, custom-service policies | 6 recorded traffic tests: **6/6 match** |
+| `real-paloalto-appid` | Palo Alto with App-ID rules and application-override | 6 recorded traffic tests: **6/6 match**, including App-ID blocking UDP 9201 after its first packets |
+| `real-fortigate-routed` | IOS-XE, FortiGate, IOS-XE, with imported routing tables | The devices' routing tables |
+| `real-cisco-bgp-ospf` | 13 Cisco routers, 4 BGP ASes over OSPF, imported routing tables (ECMP, recursive BGP next hops) | The routers' own routing tables. Also flags a real duplicate loopback IP. |
+
+On the Verification page, flows with an **observed** result show what really happened in the lab next to NetTwin's prediction.
+
+**Routing tables (dynamic routing).** An inventory entry can list collected routing-table files:
+
+```json
+{"file": "configs/r1.txt", "vendor": "cisco_ios", "routes": ["state/r1/show_ip_route.txt"]}
+```
+
+These routes then replace the static routes from the config, so OSPF, BGP, EIGRP and redistribution results come directly from the device. Supported formats are Cisco `show ip route` (FortiOS `get router info routing-table all` uses the same layout) and PAN-OS `show routing route`. BGP next hops that aren't directly connected are resolved recursively. As on many platforms, the default route is never used to resolve a next hop.
+
+**Importing more labs:**
+
+```bash
+.venv\Scripts\python.exe tools\import_batfish_lab.py <path-to-lab> samples\<new-snapshot>
+```
+
 ## Adding and changing devices in the UI
 
 - **+ Add device** (Inventory or Network Map): choose the vendor, then paste the config, upload the file, or click *Load example*. **Check config** parses it and shows what it would change before anything is saved:

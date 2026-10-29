@@ -33,7 +33,7 @@ class Route(BaseModel):
     prefix: IPv4Network
     next_hop: IPv4Address | None = None
     interface: str | None = None
-    protocol: Literal["connected", "static", "ospf", "bgp"] = "static"
+    protocol: Literal["connected", "static", "ospf", "bgp", "eigrp", "rip", "isis", "other"] = "static"
     admin_distance: int
     vrf: str = "default"
 
@@ -104,7 +104,10 @@ class Device(BaseModel):
     vendor: str
     role: Literal["router", "firewall"]
     interfaces: list[Interface] = Field(default_factory=list)
-    routes: list[Route] = Field(default_factory=list)  # configured routes; connected routes are derived
+    routes: list[Route] = Field(default_factory=list)  # connected routes are derived from interfaces
+    # "config": routes are the static routes in the config. "state": routes come from the
+    # device's collected routing table (show ip route ...), so dynamic protocols are included.
+    rib_source: Literal["config", "state"] = "config"
     addresses: dict[str, AddressObject] = Field(default_factory=dict)
     services: dict[str, Service] = Field(default_factory=dict)
     policies: list[Policy] = Field(default_factory=list)  # in evaluation order

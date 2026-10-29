@@ -1,0 +1,12 @@
+{
+  "description": "Real FortiGate lab: inside/outside hosts, custom service policies, recorded traffic tests (batfish/lab-validation)",
+  "devices": [
+    {
+      "file": "configs/fw.txt",
+      "vendor": "fortios",
+      "routes": [
+        "state/fw/get_router_info_routing-table_all.txt"
+      ]
+    }
+  ]
+}

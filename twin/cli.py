@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from twin.engine import FlowReport, Twin
-from twin.loader import load_flows, load_snapshot
+from twin.loader import load_flows, load_observed, load_snapshot
 from twin.model import Flow
 from twin.recommend import Recommendation, recommend
 
@@ -66,11 +66,18 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "batch":
         failures = 0
-        for name, flow, expect in load_flows(args.flows or Path(args.snapshot) / "flows.json"):
+        flows_file = args.flows or Path(args.snapshot) / "flows.json"
+        observed = load_observed(flows_file)
+        for name, flow, expect in load_flows(flows_file):
             rep = twin.analyze(flow)
             got = rep.kinds()
             verdict = "" if expect is None else ("  expected" if got == sorted(expect) else f"  UNEXPECTED (wanted {sorted(expect)})")
             failures += verdict.startswith("  UNEXPECTED")
+            if name in observed:
+                predicted = "allowed" if rep.ok else "blocked"
+                agrees = predicted == observed[name]
+                failures += not agrees
+                verdict += f"  | lab: {observed[name]} -> {'twin agrees' if agrees else 'TWIN DISAGREES'}"
             print(f"{name:22} {str(flow):42} {'OK' if rep.ok else ','.join(got)}{verdict}")
         return 1 if failures else 0
 

@@ -474,7 +474,12 @@ async function pageDevice(name, params) {
     interfaces: () => table(["Interface", "IP address", "Zone", "VRF", "Status", "Neighbor", "Description"], d.interfaces.map((i) => [
       `<span class="mono">${esc(i.name)}</span>`, `<span class="mono">${esc(i.ip || "-")}</span>`, esc(i.zone || "-"), esc(i.vrf),
       i.enabled ? `<span class="badge b-ok">up</span>` : `<span class="badge b-crit">admin down</span>`, esc(i.neighbor || "-"), esc(i.description)])),
-    routes: () => table(["Prefix", "Next hop", "Interface", "Protocol", "AD", "VRF", "State"], d.routes.map((r) => [
+    routes: () => (d.rib_source === "state"
+      ? `<div class="panel muted" style="margin-bottom:12px;padding:10px 14px">&#9432; Routes come from the device's collected routing table
+          (<span class="mono">${esc(d.routes_files.join(", "))}</span>), so OSPF/BGP/EIGRP results are included.
+          ${d.routing_protocols.length ? `Routing protocols in the config: <span class="mono">${esc(d.routing_protocols.join("; "))}</span>.` : ""}</div>`
+      : `<div class="panel muted" style="margin-bottom:12px;padding:10px 14px">&#9432; Routes come from the config (static routes only). Import a routing table to include dynamic routes.</div>`)
+      + table(["Prefix", "Next hop", "Interface", "Protocol", "AD", "VRF", "State"], d.routes.map((r) => [
       `<span class="mono">${esc(r.prefix)}</span>`, `<span class="mono">${esc(r.next_hop || "-")}</span>`, `<span class="mono">${esc(r.interface || "-")}</span>`,
       esc(r.protocol), r.admin_distance, esc(r.vrf), r.installed ? `<span class="badge b-ok">installed</span>` : `<span class="badge b-crit">not installed</span>`]),
       d.routes.map((r) => (r.installed ? "" : "notinstalled"))),
@@ -645,9 +650,16 @@ async function pageVerify() {
   loading("Running checks...");
   const c = await api("/checks");
   const bySev = (s) => c.findings.filter((f) => f.severity === s).length;
+  const real = c.flows.filter((f) => f.observed);
+  const realTile = real.length
+    ? `<div class="stat"><b style="color:${real.every((f) => f.agrees) ? "var(--ok)" : "var(--crit)"}">${real.filter((f) => f.agrees).length} / ${real.length}</b><span>Match real traffic tests</span></div>`
+    : "";
+  const obsBadge = (f) => !f.observed ? `<span class="muted">-</span>`
+    : `<span class="badge ${f.observed === "allowed" ? "b-ok" : "b-info"}">${f.observed}</span> ${f.agrees ? `<span class="badge b-ok" title="NetTwin predicted the same">&#10004; twin agrees</span>` : `<span class="badge b-crit" title="NetTwin predicted ${f.predicted}">&#10006; twin says ${f.predicted}</span>`}`;
   view().innerHTML = `
-    <div class="page-head"><div><h1>Verification</h1><div class="muted">Saved flows re-run against this snapshot, plus network-wide findings.</div></div></div>
+    <div class="page-head"><div><h1>Verification</h1><div class="muted">Saved flows re-run against this snapshot, plus network-wide findings.${real.length ? " Flows marked <b>observed</b> were really sent through the lab devices; the twin's prediction is scored against them." : ""}</div></div></div>
     <div class="stats">
+      ${realTile}
       <div class="stat"><b>${c.flows.length}</b><span>Saved flows</span></div>
       <div class="stat"><b style="color:var(--ok)">${c.flows.filter((f) => f.ok).length}</b><span>Working end to end</span></div>
       <div class="stat"><b style="color:var(--crit)">${c.flows.filter((f) => !f.ok).length}</b><span>With issues</span></div>
@@ -655,12 +667,13 @@ async function pageVerify() {
       <div class="stat"><b style="color:var(--crit)">${bySev("high")}</b><span>High findings</span></div>
     </div>
     <div class="panel" style="padding:0;margin-bottom:16px">
-      <table><thead><tr><th>Flow</th><th>Traffic</th><th>Result</th><th>Baseline</th><th></th></tr></thead><tbody>
+      <table><thead><tr><th>Flow</th><th>Traffic</th><th>Result</th>${real.length ? "<th>Observed in lab</th>" : ""}<th>Baseline</th><th></th></tr></thead><tbody>
       ${c.flows.map((f) => {
         const p = new URLSearchParams({ src: f.src, dst: f.dst, protocol: f.protocol });
         if (f.port != null) p.set("port", f.port);
         return `<tr><td><b>${esc(f.name)}</b></td><td class="mono">${esc(f.flow)}</td>
           <td>${f.ok ? `<span class="badge b-ok">works</span>` : f.issues.map(issueBadge).join(" ")}</td>
+          ${real.length ? `<td>${obsBadge(f)}</td>` : ""}
           <td>${f.expect == null ? `<span class="muted">-</span>` : f.matches ? `<span class="badge b-ok">matches</span>` : `<span class="badge b-crit">changed</span>`}</td>
           <td><a href="#/path?${p}">Trace &rarr;</a></td></tr>`;
       }).join("")}

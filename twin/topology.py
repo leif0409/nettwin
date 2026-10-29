@@ -34,13 +34,20 @@ def build_topology(network: Network) -> Topology:
                 attached[i.ip.network].append((dev.name, i.name))
 
     for net, ends in sorted(attached.items()):
-        if len({d for d, _ in ends}) == 1:
-            dev, iface = ends[0]
-            eid = f"{dev}:{iface}|{subnet_id(net)}"
-            topo.nodes.append({"id": subnet_id(net), "kind": "subnet", "label": str(net), "attached_to": dev})
-            topo.edges.append({"id": eid, "source": dev, "target": subnet_id(net),
-                               "source_if": iface, "target_if": "", "subnet": str(net)})
-            topo.edge_of[(dev, iface)] = eid
+        if net.prefixlen == 32 and len(ends) == 1:
+            continue  # a loopback: an address on the device, not something to draw
+        # One device: an edge LAN. Three or more: a shared segment (a switch/VLAN between them),
+        # drawn as one node rather than a full mesh of links.
+        if len({d for d, _ in ends}) != 2:
+            node = {"id": subnet_id(net), "kind": "subnet", "label": str(net), "attached_to": ends[0][0]}
+            if len(ends) > 1:
+                node["segment"] = True
+            topo.nodes.append(node)
+            for dev, iface in ends:
+                eid = f"{dev}:{iface}|{subnet_id(net)}"
+                topo.edges.append({"id": eid, "source": dev, "target": subnet_id(net),
+                                   "source_if": iface, "target_if": "", "subnet": str(net)})
+                topo.edge_of[(dev, iface)] = eid
             continue
         for a in range(len(ends)):
             for b in range(a + 1, len(ends)):

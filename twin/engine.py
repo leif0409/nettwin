@@ -107,25 +107,58 @@ class Twin:
             for i in dev.interfaces:
                 if i.enabled and i.ip is not None:
                     self._owner[i.ip.ip] = (dev.name, i.name)
+        # id(route) -> [(egress interface, adjacent next-hop IP or None)], after recursive resolution
+        self._res: dict[int, list[tuple[str, IPv4Address | None]]] = {}
         self._rib = {name: self._build_rib(dev) for name, dev in network.devices.items()}
 
     # ---- routing ---------------------------------------------------------
 
     def _build_rib(self, dev: Device) -> list[Route]:
-        """Connected routes plus configured routes whose next hop resolves via an up interface."""
+        """Connected routes plus routes whose next hop resolves, directly or recursively
+        (e.g. a BGP next hop on a loopback reached via OSPF), through up interfaces."""
         rib = dev.connected_routes()
+        pending = []
         for r in dev.routes:
-            if r.interface is not None:
-                iface = dev.interface(r.interface)
-                if iface.enabled:
-                    rib.append(r)
-                else:
-                    self.warnings.append(f"{dev.name}: route {r.prefix} not installed, interface {r.interface} is down")
-            elif self._egress(dev, r.next_hop, r.vrf) is not None:
+            if r.interface is not None and not dev.interface(r.interface).enabled:
+                self.warnings.append(f"{dev.name}: route {r.prefix} not installed, interface {r.interface} is down")
+            elif r.next_hop is None:
                 rib.append(r)
+                self._res[id(r)] = [(r.interface, None)]
             else:
-                self.warnings.append(f"{dev.name}: route {r.prefix} not installed, next hop {r.next_hop} unreachable")
+                pending.append(r)
+        for _ in range(5):  # each pass can resolve routes that depend on routes installed in the last one
+            unresolved = []
+            for r in pending:
+                hops = self._resolve(dev, rib, r)
+                if hops:
+                    rib.append(r)
+                    self._res[id(r)] = hops
+                else:
+                    unresolved.append(r)
+            if len(unresolved) == len(pending):
+                break
+            pending = unresolved
+        for r in pending:
+            self.warnings.append(f"{dev.name}: route {r.prefix} not installed, next hop {r.next_hop} unreachable")
         return rib
+
+    def _resolve(self, dev: Device, rib: list[Route], r: Route) -> list[tuple[str, IPv4Address | None]]:
+        if r.interface is not None:
+            return [(r.interface, r.next_hop)]
+        direct = self._egress(dev, r.next_hop, r.vrf)
+        if direct is not None:
+            return [(direct, r.next_hop)]
+        # Never resolve a next hop through the default route: that would make a route whose
+        # next hop is really gone look healthy (and is off by default on many platforms).
+        via = [b for b in self._best([x for x in rib if x.prefix.prefixlen > 0], r.next_hop, r.vrf)
+               if b.prefix != r.prefix]
+        hops = []
+        for b in via:
+            for out_if, adj in self._res.get(id(b), []):
+                hop = (out_if, adj or r.next_hop)
+                if hop not in hops:
+                    hops.append(hop)
+        return hops
 
     @staticmethod
     def _egress(dev: Device, next_hop: IPv4Address, vrf: str) -> str | None:
@@ -136,7 +169,11 @@ class Twin:
 
     def lookup(self, device: str, dst: IPv4Address, vrf: str = "default") -> list[Route]:
         """Best routes: longest prefix, then lowest admin distance. Several results = ECMP."""
-        cands = [r for r in self._rib[device] if r.vrf == vrf and dst in r.prefix]
+        return self._best(self._rib[device], dst, vrf)
+
+    @staticmethod
+    def _best(rib: list[Route], dst: IPv4Address, vrf: str) -> list[Route]:
+        cands = [r for r in rib if r.vrf == vrf and dst in r.prefix]
         if not cands:
             return []
         longest = max(r.prefix.prefixlen for r in cands)
@@ -183,17 +220,30 @@ class Twin:
         if not routes:
             out.append(Path(hops + [self._hop(dev, in_if, None)], "no_route", f"{name} has no route to {dst}"))
             return
+        nexthops = []  # ECMP routes and recursive resolution can both fan out; dedupe the adjacencies
         for r in routes:
             if r.protocol == "connected":
                 out.append(Path(hops + [self._hop(dev, in_if, r.interface)], "delivered"))
                 continue
-            out_if = r.interface or self._egress(dev, r.next_hop, vrf)
+            for out_if, adj in self._res[id(r)]:
+                if (out_if, adj) not in nexthops:
+                    nexthops.append((out_if, adj))
+        for out_if, adj in nexthops:
             hop = self._hop(dev, in_if, out_if)
-            owner = self._owner.get(r.next_hop) if r.next_hop else None
+            owner = self._owner.get(adj) if adj else self._peer_on(dev, out_if)
             if owner is None:
-                out.append(Path(hops + [hop], "leaves_model", f"{name} forwards to {r.next_hop or out_if}, not a modeled device"))
+                out.append(Path(hops + [hop], "leaves_model", f"{name} forwards to {adj or out_if}, not a modeled device"))
                 continue
             self._walk(owner[0], owner[1], dst, hops + [hop], seen | {name}, out)
+
+    def _peer_on(self, dev: Device, out_if: str) -> tuple[str, str] | None:
+        """For an interface route with no next hop: the single other device on that subnet, if any."""
+        iface = dev.interface(out_if)
+        if iface is None or iface.ip is None:
+            return None
+        peers = [(d.name, i.name) for d in self.network.devices.values() if d.name != dev.name
+                 for i in d.interfaces if i.enabled and i.ip and i.ip.network == iface.ip.network]
+        return peers[0] if len(peers) == 1 else None
 
     # ---- policy ----------------------------------------------------------
 

@@ -1,0 +1,96 @@
+{
+  "description": "Real 13-router Cisco network: 4 BGP ASes, OSPF IGP, imported routing tables (batfish/lab-validation)",
+  "devices": [
+    {
+      "file": "configs/as1border1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as1border1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as1border2.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as1border2/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as1core1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as1core1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2border1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2border1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2border2.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2border2/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2core1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2core1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2core2.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2core2/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2dept1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2dept1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2dist1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2dist1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as2dist2.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as2dist2/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as3border1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as3border1/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as3border2.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as3border2/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/as3core1.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/as3core1/show_ip_route.txt"
+      ]
+    }
+  ]
+}

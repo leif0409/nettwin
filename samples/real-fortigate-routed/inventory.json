@@ -1,0 +1,26 @@
+{
+  "description": "Real 3-device lab: IOS-XE - FortiGate - IOS-XE with routing tables (batfish/lab-validation)",
+  "devices": [
+    {
+      "file": "configs/d1_inside.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/d1_inside/show_ip_route.txt"
+      ]
+    },
+    {
+      "file": "configs/d2_fw.txt",
+      "vendor": "fortios",
+      "routes": [
+        "state/d2_fw/get_router_info_routing-table_all.txt"
+      ]
+    },
+    {
+      "file": "configs/d3_outside.txt",
+      "vendor": "cisco_ios",
+      "routes": [
+        "state/d3_outside/show_ip_route.txt"
+      ]
+    }
+  ]
+}

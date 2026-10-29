@@ -17,7 +17,7 @@ from pydantic import BaseModel, ValidationError
 from twin import workspace
 from twin.drivers import get_driver
 from twin.engine import FlowReport, Path as TwinPath, Twin
-from twin.loader import load_flows, load_snapshot
+from twin.loader import load_flows, load_observed, load_snapshot
 from twin.model import Flow, Network
 from twin.recommend import Recommendation, recommend
 from twin.topology import Topology, build_topology
@@ -156,6 +156,8 @@ def api_device(snap: str, name: str):
     return {
         "name": d.name, "vendor": d.vendor, "role": d.role, "site": d.vendor_extra.get("site", ""),
         "source_file": d.vendor_extra["source_file"], "default_action": d.default_action,
+        "rib_source": d.rib_source, "routes_files": d.vendor_extra.get("routes_files", []),
+        "routing_protocols": d.vendor_extra.get("routing_protocols", []),
         "interfaces": [{"name": i.name, "ip": str(i.ip) if i.ip else "", "zone": i.zone or "", "vrf": i.vrf,
                         "enabled": i.enabled, "description": i.description,
                         "neighbor": _neighbor(s, d.name, i.name)} for i in d.interfaces],
@@ -199,14 +201,27 @@ def api_checks(snap: str):
     flows_file = s.path / "flows.json"
     results = []
     if flows_file.is_file():
+        observed = load_observed(flows_file)
         for name, flow, expect in load_flows(flows_file):
             rep = s.twin.analyze(flow)
             got = rep.kinds()
+            predicted = "allowed" if rep.ok else "blocked"
             results.append({"name": name, "src": str(flow.src), "dst": str(flow.dst), "protocol": flow.protocol,
                             "port": flow.port, "flow": str(flow), "ok": rep.ok, "issues": got,
                             "expect": sorted(expect) if expect is not None else None,
-                            "matches": expect is None or got == sorted(expect)})
+                            "matches": expect is None or got == sorted(expect),
+                            "predicted": predicted, "observed": observed.get(name),
+                            "agrees": None if name not in observed else observed[name] == predicted})
     findings = []
+    owners: dict[str, list[str]] = {}
+    for d in s.network.devices.values():
+        for i in d.interfaces:
+            if i.enabled and i.ip is not None:
+                owners.setdefault(str(i.ip.ip), []).append(f"{d.name} {i.name}")
+    for ip, where in owners.items():
+        if len({w.split()[0] for w in where}) > 1:
+            findings.append({"severity": "high", "device": where[0].split()[0], "category": "Duplicate IP",
+                             "message": f"{ip} is configured on {', '.join(where)}"})
     for d in s.network.devices.values():
         findings += [{"severity": "info", "device": d.name, "category": "Not modeled", "message": u} for u in d.unsupported]
         findings += [{"severity": "low", "device": d.name, "category": "Disabled rule", "message": f"rule {p.name!r} is disabled"}

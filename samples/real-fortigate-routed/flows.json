@@ -1,0 +1,5 @@
+[
+  {"name": "inside-to-outside-ping", "src": "192.168.123.1", "dst": "192.168.123.3", "protocol": "icmp", "expect": []},
+  {"name": "inside-to-outside-https", "src": "192.168.123.1", "dst": "192.168.123.3", "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "outside-to-inside-ssh", "src": "192.168.123.3", "dst": "192.168.123.1", "protocol": "tcp", "port": 22, "expect": []}
+]

@@ -1,0 +1,7 @@
+[
+  {"name": "dept-to-as3-link-ecmp", "src": "2.128.0.10", "dst": "3.0.2.10", "protocol": "icmp", "expect": []},
+  {"name": "dept-to-as1-link", "src": "2.128.0.10", "dst": "1.0.1.10", "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "dept-to-as3-lan-90", "src": "2.128.0.10", "dst": "90.90.90.10", "protocol": "tcp", "port": 443, "expect": ["FORWARD_UNREACHABLE"]},
+  {"name": "dept-to-as1-loopback", "src": "2.128.1.10", "dst": "1.10.1.1", "protocol": "icmp", "expect": ["FORWARD_UNREACHABLE"]},
+  {"name": "as3-lan-90-to-as1-link", "src": "90.90.90.10", "dst": "1.0.1.10", "protocol": "icmp", "expect": ["REVERSE_UNREACHABLE"]}
+]

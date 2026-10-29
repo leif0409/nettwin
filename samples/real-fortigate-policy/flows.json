@@ -1,0 +1,8 @@
+[
+  {"name": "inside-to-outside-tcp9100", "src": "192.168.123.1", "dst": "192.168.123.6", "protocol": "tcp", "port": 9100, "observed": "allowed", "expect": []},
+  {"name": "inside-to-outside-tcp9101", "src": "192.168.123.1", "dst": "192.168.123.6", "protocol": "tcp", "port": 9101, "observed": "blocked", "expect": ["POLICY_DENY"]},
+  {"name": "inside-to-outside-udp9200", "src": "192.168.123.1", "dst": "192.168.123.6", "protocol": "udp", "port": 9200, "observed": "allowed", "expect": []},
+  {"name": "inside-to-outside-udp9201", "src": "192.168.123.1", "dst": "192.168.123.6", "protocol": "udp", "port": 9201, "observed": "blocked", "expect": ["POLICY_DENY"]},
+  {"name": "inside-ping-192.168.123.6", "src": "192.168.123.1", "dst": "192.168.123.6", "protocol": "icmp", "observed": "allowed", "expect": []},
+  {"name": "outside-ping-192.168.123.1", "src": "192.168.123.6", "dst": "192.168.123.1", "protocol": "icmp", "observed": "allowed", "expect": []}
+]

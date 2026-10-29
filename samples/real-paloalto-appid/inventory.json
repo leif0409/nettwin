@@ -1,0 +1,12 @@
+{
+  "description": "Real Palo Alto lab: App-ID rules with application-override, recorded traffic tests (batfish/lab-validation)",
+  "devices": [
+    {
+      "file": "configs/fw.txt",
+      "vendor": "panos",
+      "routes": [
+        "state/fw/run_show_routing_route.txt"
+      ]
+    }
+  ]
+}

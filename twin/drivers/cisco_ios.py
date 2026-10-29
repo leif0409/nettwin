@@ -38,10 +38,12 @@ class CiscoIOSDriver(Driver):
             if indented:
                 if current is None:
                     continue  # body of a block we don't model (already flagged)
-                if tok[:2] == ["ip", "address"] and len(tok) >= 4:
+                if tok[:2] == ["ip", "address"] and len(tok) >= 3 and tok[2][0].isdigit():
                     if "secondary" in tok:
                         unsupported.append(f"{current['name']}: secondary address {tok[2]}")
-                    else:
+                    elif "/" in tok[2]:  # 10.0.0.1/24 style (IOS-XE alternates, NX-OS, EOS)
+                        current["ip"] = IPv4Interface(tok[2])
+                    elif len(tok) >= 4:
                         current["ip"] = IPv4Interface(f"{tok[2]}/{tok[3]}")
                 elif tok[0] == "shutdown":
                     current["enabled"] = False
@@ -76,8 +78,10 @@ class CiscoIOSDriver(Driver):
         vrf = "default"
         if args[0] == "vrf":
             vrf, args = args[1], args[2:]
-        prefix = IPv4Network(f"{args[0]}/{args[1]}")
-        rest = args[2:]
+        if "/" in args[0]:
+            prefix, rest = IPv4Network(args[0]), args[1:]
+        else:
+            prefix, rest = IPv4Network(f"{args[0]}/{args[1]}"), args[2:]
         next_hop = interface = None
         if _is_ip(rest[0]):
             next_hop, rest = rest[0], rest[1:]
