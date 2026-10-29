@@ -1,0 +1,11 @@
+[
+  {"name": "users-to-app-https",  "src": "10.1.10.50",  "dst": "10.2.20.10", "protocol": "tcp", "port": 443,  "expect": []},
+  {"name": "users-to-app-alt",    "src": "10.1.10.50",  "dst": "10.2.20.10", "protocol": "tcp", "port": 8085, "expect": []},
+  {"name": "app-to-db",           "src": "10.2.20.10",  "dst": "10.3.30.11", "protocol": "tcp", "port": 5432, "expect": []},
+  {"name": "users-to-db",         "src": "10.1.10.50",  "dst": "10.3.30.10", "protocol": "tcp", "port": 5432, "expect": ["POLICY_DENY"]},
+  {"name": "users-telnet",        "src": "10.1.10.50",  "dst": "10.2.20.10", "protocol": "tcp", "port": 23,   "expect": ["EXPLICIT_DENY"]},
+  {"name": "users-high-to-app",   "src": "10.1.10.200", "dst": "10.2.20.10", "protocol": "tcp", "port": 443,  "expect": ["ASYMMETRIC_BYPASS"]},
+  {"name": "app-to-users-high",   "src": "10.2.20.10",  "dst": "10.1.10.200", "protocol": "tcp", "port": 22,  "expect": ["ASYMMETRIC_NO_SESSION"]},
+  {"name": "users-to-unknown",    "src": "10.1.10.50",  "dst": "10.6.60.10", "protocol": "tcp", "port": 443,  "expect": ["FORWARD_UNREACHABLE", "POLICY_DENY"]},
+  {"name": "users-to-loop",       "src": "10.1.10.50",  "dst": "10.5.50.10", "protocol": "tcp", "port": 443,  "expect": ["FORWARD_UNREACHABLE", "POLICY_DENY"]}
+]

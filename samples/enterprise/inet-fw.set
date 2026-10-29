@@ -1,0 +1,35 @@
+set deviceconfig system hostname INET-FW
+set network interface ethernet ethernet1/1 layer3 ip 172.21.5.2/30
+set network interface ethernet ethernet1/2 layer3 ip 203.0.113.2/29
+set network interface ethernet ethernet1/3 layer3 ip 10.200.0.1/24
+set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
+set zone trust network layer3 ethernet1/1
+set zone untrust network layer3 ethernet1/2
+set zone dmz network layer3 ethernet1/3
+set network virtual-router default routing-table ip static-route internal destination 10.0.0.0/8
+set network virtual-router default routing-table ip static-route internal nexthop ip-address 172.21.5.1
+set network virtual-router default routing-table ip static-route isp destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route isp nexthop ip-address 203.0.113.1
+set address internal ip-netmask 10.0.0.0/8
+set address dmz-web ip-range 10.200.0.10-10.200.0.20
+set service svc-http protocol tcp port 80
+set service svc-https protocol tcp port 443
+set rulebase security rules inside-to-internet from trust
+set rulebase security rules inside-to-internet to untrust
+set rulebase security rules inside-to-internet source internal
+set rulebase security rules inside-to-internet destination any
+set rulebase security rules inside-to-internet service [ svc-http svc-https ]
+set rulebase security rules inside-to-internet action allow
+set rulebase security rules inside-to-dmz from trust
+set rulebase security rules inside-to-dmz to dmz
+set rulebase security rules inside-to-dmz source internal
+set rulebase security rules inside-to-dmz destination dmz-web
+set rulebase security rules inside-to-dmz service svc-https
+set rulebase security rules inside-to-dmz action allow
+set rulebase security rules dmz-to-inside from dmz
+set rulebase security rules dmz-to-inside to trust
+set rulebase security rules dmz-to-inside source any
+set rulebase security rules dmz-to-inside destination any
+set rulebase security rules dmz-to-inside service any
+set rulebase security rules dmz-to-inside action deny
+set rulebase nat rules outbound-pat from trust

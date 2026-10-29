@@ -1,0 +1,9 @@
+{
+  "description": "Small 4-vendor lab with planted routing and policy bugs.",
+  "devices": [
+    {"file": "r1.cfg", "vendor": "cisco_ios", "site": "Branch", "pos": [120, 300]},
+    {"file": "fw1.set", "vendor": "panos", "site": "Branch", "pos": [320, 160]},
+    {"file": "core.conf", "vendor": "junos", "site": "DC", "pos": [520, 300]},
+    {"file": "fw2.conf", "vendor": "fortios", "site": "DC", "pos": [720, 160]}
+  ]
+}

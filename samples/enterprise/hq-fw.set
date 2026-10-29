@@ -1,0 +1,53 @@
+set deviceconfig system hostname HQ-FW
+set network interface ethernet ethernet1/1 layer3 ip 172.20.20.2/30
+set network interface ethernet ethernet1/2 layer3 ip 172.22.1.1/30
+set network virtual-router default interface [ ethernet1/1 ethernet1/2 ]
+set zone untrust network layer3 ethernet1/1
+set zone trust network layer3 ethernet1/2
+set network virtual-router default routing-table ip static-route hq destination 10.1.0.0/16
+set network virtual-router default routing-table ip static-route hq nexthop ip-address 172.22.1.2
+set network virtual-router default routing-table ip static-route default-out destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-out nexthop ip-address 172.20.20.1
+set address hq-users ip-netmask 10.1.10.0/24
+set address hq-it ip-netmask 10.1.20.0/24
+set address hq-printers ip-netmask 10.1.30.0/24
+set address dc-app ip-netmask 10.100.10.0/24
+set address dc-db ip-netmask 10.100.20.0/24
+set address dc-mgmt ip-netmask 10.100.30.0/24
+set address br1-lan ip-netmask 10.11.0.0/24
+set address br2-lan ip-netmask 10.12.0.0/24
+set address br3-lan ip-netmask 10.13.0.0/24
+set address br4-lan ip-netmask 10.14.0.0/24
+set address-group branches static [ br1-lan br2-lan br3-lan br4-lan ]
+set address-group dc-all static [ dc-app dc-db dc-mgmt ]
+set service svc-http protocol tcp port 80
+set service svc-https protocol tcp port 443
+set service svc-ssh protocol tcp port 22
+set service svc-pg protocol tcp port 5432
+set service svc-print protocol tcp port 9100
+set service-group web members [ svc-http svc-https ]
+set rulebase security rules users-web from trust
+set rulebase security rules users-web to untrust
+set rulebase security rules users-web source hq-users
+set rulebase security rules users-web destination any
+set rulebase security rules users-web service web
+set rulebase security rules users-web action allow
+set rulebase security rules it-to-dc from trust
+set rulebase security rules it-to-dc to untrust
+set rulebase security rules it-to-dc source hq-it
+set rulebase security rules it-to-dc destination dc-all
+set rulebase security rules it-to-dc service [ svc-ssh svc-https svc-pg ]
+set rulebase security rules it-to-dc action allow
+set rulebase security rules deny-users-db from trust
+set rulebase security rules deny-users-db to untrust
+set rulebase security rules deny-users-db source hq-users
+set rulebase security rules deny-users-db destination dc-db
+set rulebase security rules deny-users-db service any
+set rulebase security rules deny-users-db action deny
+set rulebase security rules branch-print from untrust
+set rulebase security rules branch-print to trust
+set rulebase security rules branch-print source branches
+set rulebase security rules branch-print destination hq-printers
+set rulebase security rules branch-print service svc-print
+set rulebase security rules branch-print action allow
+set rulebase nat rules outbound-pat from trust

@@ -1,0 +1,18 @@
+[
+  {"name": "br1-to-app-https",     "src": "10.11.0.50",  "dst": "10.100.10.20", "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "br4-to-app-https",     "src": "10.14.0.20",  "dst": "10.100.10.20", "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "hq-users-to-app",      "src": "10.1.10.50",  "dst": "10.100.10.20", "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "app-to-db-postgres",   "src": "10.100.10.20", "dst": "10.100.20.30", "protocol": "tcp", "port": 5432, "expect": []},
+  {"name": "hq-users-to-dmz-web",  "src": "10.1.10.50",  "dst": "10.200.0.15",  "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "hq-users-to-internet", "src": "10.1.10.50",  "dst": "8.8.8.8",      "protocol": "tcp", "port": 443, "expect": []},
+  {"name": "br2-to-app-8443",      "src": "10.12.0.50",  "dst": "10.100.10.20", "protocol": "tcp", "port": 8443, "expect": ["POLICY_DENY"]},
+  {"name": "br1-to-db-postgres",   "src": "10.11.0.50",  "dst": "10.100.20.30", "protocol": "tcp", "port": 5432, "expect": ["POLICY_DENY"]},
+  {"name": "hq-users-to-dmz-8443", "src": "10.1.10.50",  "dst": "10.200.0.15",  "protocol": "tcp", "port": 8443, "expect": ["POLICY_DENY"]},
+  {"name": "hq-users-dns-out",     "src": "10.1.10.50",  "dst": "8.8.8.8",      "protocol": "udp", "port": 53, "expect": ["POLICY_DENY"]},
+  {"name": "dc-mgmt-to-br4-ssh",   "src": "10.100.30.5", "dst": "10.14.0.20",   "protocol": "tcp", "port": 22, "expect": ["POLICY_DENY"]},
+  {"name": "app-to-db-mysql",      "src": "10.100.10.20", "dst": "10.100.20.30", "protocol": "tcp", "port": 3306, "expect": ["EXPLICIT_DENY"]},
+  {"name": "hq-users-to-db",       "src": "10.1.10.50",  "dst": "10.100.20.30", "protocol": "tcp", "port": 5432, "expect": ["EXPLICIT_DENY","POLICY_DENY"]},
+  {"name": "dmz-to-app",           "src": "10.200.0.15", "dst": "10.100.10.20", "protocol": "tcp", "port": 443, "expect": ["EXPLICIT_DENY","POLICY_DENY"]},
+  {"name": "hq-it-to-mgmt-ssh",    "src": "10.1.20.40",  "dst": "10.100.30.5",  "protocol": "tcp", "port": 22, "expect": ["ASYMMETRIC_NO_SESSION"]},
+  {"name": "br3-to-app-https",     "src": "10.13.0.50",  "dst": "10.100.10.20", "protocol": "tcp", "port": 443, "expect": ["REVERSE_UNREACHABLE"]}
+]

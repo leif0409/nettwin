@@ -1,0 +1,16 @@
+{
+  "description": "11-device multi-site network: 4 branches, WAN hub, HQ, data center, internet edge.",
+  "devices": [
+    {"file": "br1.cfg", "vendor": "cisco_ios", "site": "Branch 1", "pos": [60, 90]},
+    {"file": "br2.cfg", "vendor": "cisco_ios", "site": "Branch 2", "pos": [60, 260]},
+    {"file": "br3.conf", "vendor": "junos", "site": "Branch 3", "pos": [60, 430]},
+    {"file": "br4.conf", "vendor": "fortios", "site": "Branch 4", "pos": [60, 600]},
+    {"file": "wan-hub.cfg", "vendor": "cisco_ios", "site": "WAN", "pos": [330, 345]},
+    {"file": "dc-core1.conf", "vendor": "junos", "site": "Data Center", "pos": [580, 230]},
+    {"file": "dc-core2.conf", "vendor": "junos", "site": "Data Center", "pos": [580, 420]},
+    {"file": "dc-fw.conf", "vendor": "fortios", "site": "Data Center", "pos": [820, 325]},
+    {"file": "inet-fw.set", "vendor": "panos", "site": "Internet Edge", "pos": [820, 90]},
+    {"file": "hq-fw.set", "vendor": "panos", "site": "HQ", "pos": [520, 610]},
+    {"file": "hq-core.cfg", "vendor": "cisco_ios", "site": "HQ", "pos": [780, 640]}
+  ]
+}

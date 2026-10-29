@@ -1,0 +1,40 @@
+# FW1 - users edge firewall (Palo Alto PAN-OS "set" style)
+set deviceconfig system hostname FW1
+set network interface ethernet ethernet1/1 layer3 ip 172.16.1.2/30
+set network interface ethernet ethernet1/2 layer3 ip 172.16.2.1/30
+set network virtual-router default interface [ ethernet1/1 ethernet1/2 ]
+set zone trust network layer3 ethernet1/1
+set zone untrust network layer3 ethernet1/2
+set network virtual-router default routing-table ip static-route users destination 10.1.10.0/24
+set network virtual-router default routing-table ip static-route users nexthop ip-address 172.16.1.1
+set network virtual-router default routing-table ip static-route default-out destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-out nexthop ip-address 172.16.2.2
+set address users-net ip-netmask 10.1.10.0/24
+set address app-net ip-netmask 10.2.20.0/24
+set address db-net ip-netmask 10.3.30.0/24
+set address db-vip ip-range 10.3.30.10-10.3.30.12
+set address-group db-all static [ db-net db-vip ]
+set service svc-telnet protocol tcp port 23
+set service svc-https protocol tcp port 443
+set service svc-web-alt protocol tcp port 8080-8090
+set service svc-postgres protocol tcp port 5432
+set service-group web members [ svc-https svc-web-alt ]
+set rulebase security rules block-telnet from trust
+set rulebase security rules block-telnet to untrust
+set rulebase security rules block-telnet source any
+set rulebase security rules block-telnet destination any
+set rulebase security rules block-telnet service svc-telnet
+set rulebase security rules block-telnet action deny
+set rulebase security rules users-to-app from trust
+set rulebase security rules users-to-app to untrust
+set rulebase security rules users-to-app source users-net
+set rulebase security rules users-to-app destination app-net
+set rulebase security rules users-to-app application [ ssl web-browsing ]
+set rulebase security rules users-to-app service web
+set rulebase security rules users-to-app action allow
+set rulebase security rules users-to-db from trust
+set rulebase security rules users-to-db to untrust
+set rulebase security rules users-to-db source users-net
+set rulebase security rules users-to-db destination db-all
+set rulebase security rules users-to-db service svc-postgres
+set rulebase security rules users-to-db action allow
