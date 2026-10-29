@@ -1,0 +1,3 @@
+# Keep LF everywhere: sample configs and routing tables are captured device output, and
+# tools/gen_global_lab.py output is checked byte-for-byte against samples/global-corp.
+* text=auto eol=lf

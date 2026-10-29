@@ -1,0 +1,486 @@
+#config-version=FG600E-7.2.8-FW-build1639-240313:opmode=0:vdom=0:user=netadmin
+#conf_file_ver=2961847503125
+#buildno=1639
+#global_vdom=1
+config system global
+    set admin-sport 8443
+    set alias "FG-600E"
+    set hostname "na-hq-fw1"
+    set timezone 12
+    set admintimeout 15
+end
+config system interface
+    edit "port1"
+        set vdom "root"
+        set ip 172.16.10.1 255.255.255.254
+        set allowaccess ping
+        set type physical
+        set alias "to na-dc1-wan1 GigabitEthernet0/0/4"
+        set role wan
+        set snmp-index 1
+    next
+    edit "port2"
+        set vdom "root"
+        set ip 172.16.10.3 255.255.255.254
+        set allowaccess ping
+        set type physical
+        set alias "to na-dc1-wan2 GigabitEthernet0/0/4"
+        set role wan
+        set snmp-index 2
+    next
+    edit "port3"
+        set vdom "root"
+        set ip 10.2.0.1 255.255.255.248
+        set allowaccess ping
+        set type physical
+        set alias "HQ-FW-INSIDE"
+        set role lan
+        set snmp-index 3
+    next
+    edit "mgmt"
+        set vdom "root"
+        set ip 192.168.12.21 255.255.255.0
+        set allowaccess ping https ssh snmp
+        set dedicated-to management
+        set snmp-index 4
+    next
+end
+config system zone
+    edit "wan"
+        set intrazone deny
+        set interface "port1" "port2"
+    next
+    edit "lan"
+        set intrazone deny
+        set interface "port3"
+    next
+end
+config firewall address
+    edit "all"
+        set uuid 5c6c9354-6ec3-5567-ba19-0a96a802bef0
+    next
+    edit "corp-all"
+        set uuid 2f2798be-20c9-5fc0-ae2e-237ca26280b7
+        set subnet 10.0.0.0 255.0.0.0
+    next
+    edit "eu-br-voice"
+        set uuid 97d0869b-2c5a-5c72-b23f-f5cc0321cb24
+        set subnet 10.35.101.0 255.255.255.0
+    next
+    edit "eu-hq-voice"
+        set uuid 95cde528-9b09-5208-94e8-2b7825d8f2c8
+        set subnet 10.34.20.0 255.255.255.0
+    next
+    edit "na-br-chi"
+        set uuid db971fbe-3afc-51ff-9804-d64f442de2ba
+        set subnet 10.3.1.0 255.255.255.0
+    next
+    edit "na-br-mex"
+        set uuid ca1d3692-b6f9-5c22-ad4a-b2989c0e2fc3
+        set subnet 10.3.3.0 255.255.255.0
+    next
+    edit "na-br-tor"
+        set uuid 443baa14-f8d3-52a1-97cf-6f0c2a10d23e
+        set subnet 10.3.2.0 255.255.255.0
+    next
+    edit "na-br-voice"
+        set uuid 50ae02f8-1c9b-5b83-8b8b-9defcdcd19a4
+        set subnet 10.3.100.0 255.255.252.0
+    next
+    edit "na-hq-it"
+        set uuid e5189ae8-2f68-54db-853e-9c4d56958be7
+        set subnet 10.2.50.0 255.255.255.0
+    next
+    edit "na-hq-printers"
+        set uuid 11fcda32-2b2e-585d-ad49-e4327f19ac26
+        set subnet 10.2.40.0 255.255.255.0
+    next
+    edit "na-hq-users"
+        set uuid 05f84bbf-d73f-56a0-bf40-75dcb1cda4fd
+        set subnet 10.2.10.0 255.255.255.0
+    next
+    edit "na-hq-voice"
+        set uuid 07089d13-29d0-544c-9cd7-091abad918e0
+        set subnet 10.2.20.0 255.255.255.0
+    next
+    edit "na-hq-wifi"
+        set uuid 05f98f7c-00ad-5c80-89cb-983fe2a8b956
+        set subnet 10.2.30.0 255.255.255.0
+    next
+end
+config firewall addrgrp
+    edit "corp-voice"
+        set uuid 628a1893-a8d2-5d47-8821-51ecb1143a9c
+        set member "na-hq-voice" "na-br-voice" "eu-hq-voice" "eu-br-voice"
+    next
+    edit "na-branches"
+        set uuid 71638b01-bb11-50b8-b833-70b5f6be28f7
+        set member "na-br-chi" "na-br-tor" "na-br-mex"
+    next
+end
+config firewall service custom
+    edit "ALL"
+        set category "General"
+        set protocol IP
+    next
+    edit "PING"
+        set category "Network Services"
+        set protocol ICMP
+        unset icmptype
+    next
+    edit "HTTP"
+        set category "Web Access"
+        set tcp-portrange 80
+    next
+    edit "HTTPS"
+        set category "Web Access"
+        set tcp-portrange 443
+    next
+    edit "DNS"
+        set category "General"
+        set tcp-portrange 53
+        set udp-portrange 53
+    next
+    edit "NTP"
+        set category "General"
+        set udp-portrange 123
+    next
+    edit "SSH"
+        set category "General"
+        set tcp-portrange 22
+    next
+    edit "RDP"
+        set category "General"
+        set tcp-portrange 3389
+    next
+    edit "SNMP"
+        set category "General"
+        set udp-portrange 161-162
+    next
+    edit "SIP"
+        set category "General"
+        set udp-portrange 5060
+    next
+    edit "RTP"
+        set category "General"
+        set udp-portrange 16384-32767
+    next
+    edit "APP-8443"
+        set category "General"
+        set tcp-portrange 8443
+    next
+    edit "PRINTER-9100"
+        set category "General"
+        set tcp-portrange 9100
+    next
+end
+config firewall policy
+    edit 1
+        set name "users-internet"
+        set uuid 9d3d123d-c3dc-5303-9944-3dd9f381c1ea
+        set srcintf "lan"
+        set dstintf "wan"
+        set action accept
+        set srcaddr "na-hq-users" "na-hq-wifi" "na-hq-it"
+        set dstaddr "all"
+        set schedule "always"
+        set service "HTTP" "HTTPS" "DNS"
+        set logtraffic all
+    next
+    edit 2
+        set name "corp-apps"
+        set uuid c6db165e-e4fb-58a2-9978-516cf9629e01
+        set srcintf "lan"
+        set dstintf "wan"
+        set action accept
+        set srcaddr "na-hq-users" "na-hq-it"
+        set dstaddr "corp-all"
+        set schedule "always"
+        set service "HTTPS" "APP-8443"
+        set logtraffic all
+    next
+    edit 3
+        set name "it-admin"
+        set uuid c2ef0cc7-9c57-5a95-8fd1-531cede51b4b
+        set srcintf "lan"
+        set dstintf "wan"
+        set action accept
+        set srcaddr "na-hq-it"
+        set dstaddr "corp-all"
+        set schedule "always"
+        set service "SSH" "RDP" "SNMP"
+        set logtraffic all
+    next
+    edit 4
+        set name "voice-out"
+        set uuid 7ac37255-ad18-5f02-829c-23230b21e069
+        set srcintf "lan"
+        set dstintf "wan"
+        set action accept
+        set srcaddr "na-hq-voice"
+        set dstaddr "corp-voice"
+        set schedule "always"
+        set service "SIP" "RTP"
+        set logtraffic all
+    next
+    edit 5
+        set name "voice-in"
+        set uuid 6afde298-37b0-5ef2-a368-1adb7f733334
+        set srcintf "wan"
+        set dstintf "lan"
+        set action accept
+        set srcaddr "corp-voice"
+        set dstaddr "na-hq-voice"
+        set schedule "always"
+        set service "SIP" "RTP"
+        set logtraffic all
+    next
+    edit 6
+        set name "branch-print"
+        set uuid 4d00b57b-268b-59e9-9f9d-2578eb58c109
+        set srcintf "wan"
+        set dstintf "lan"
+        set action accept
+        set srcaddr "na-branches"
+        set dstaddr "na-hq-printers"
+        set schedule "always"
+        set service "PRINTER-9100"
+        set logtraffic all
+    next
+end
+config router static
+    edit 1
+        set gateway 172.16.10.0
+        set device "port1"
+        set comment "default"
+    next
+    edit 2
+        set gateway 172.16.10.2
+        set device "port2"
+        set comment "default"
+    next
+    edit 3
+        set dst 10.2.0.8 255.255.255.254
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 4
+        set dst 10.2.0.8 255.255.255.254
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 5
+        set dst 10.2.10.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 6
+        set dst 10.2.10.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 7
+        set dst 10.2.20.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 8
+        set dst 10.2.20.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 9
+        set dst 10.2.30.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 10
+        set dst 10.2.30.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 11
+        set dst 10.2.40.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 12
+        set dst 10.2.40.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 13
+        set dst 10.2.50.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 14
+        set dst 10.2.50.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 15
+        set dst 10.2.99.0 255.255.255.0
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 16
+        set dst 10.2.99.0 255.255.255.0
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 17
+        set dst 10.3.1.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 18
+        set dst 10.3.2.0 255.255.255.0
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 19
+        set dst 10.3.3.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 20
+        set dst 10.3.101.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 21
+        set dst 10.3.102.0 255.255.255.0
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 22
+        set dst 10.3.103.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 23
+        set dst 10.35.1.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 24
+        set dst 10.35.3.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 25
+        set dst 10.35.101.0 255.255.255.0
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 26
+        set dst 10.255.1.1 255.255.255.255
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 27
+        set dst 10.255.1.2 255.255.255.255
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 28
+        set dst 10.255.1.21 255.255.255.255
+        set gateway 10.2.0.2
+        set device "port3"
+    next
+    edit 29
+        set dst 10.255.1.22 255.255.255.255
+        set gateway 10.2.0.3
+        set device "port3"
+    next
+    edit 30
+        set dst 10.255.1.31 255.255.255.255
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 31
+        set dst 10.255.1.32 255.255.255.255
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 32
+        set dst 10.255.1.33 255.255.255.255
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 33
+        set dst 10.255.2.1 255.255.255.255
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 34
+        set dst 10.255.2.2 255.255.255.255
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 35
+        set dst 10.255.2.31 255.255.255.255
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 36
+        set dst 10.255.2.32 255.255.255.255
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 37
+        set dst 172.16.20.0 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 38
+        set dst 172.16.20.2 255.255.255.254
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 39
+        set dst 172.16.20.4 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 40
+        set dst 172.17.10.0 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 41
+        set dst 172.17.10.2 255.255.255.254
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 42
+        set dst 172.17.20.0 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 43
+        set dst 172.17.20.2 255.255.255.254
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+    edit 44
+        set dst 172.17.20.4 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 45
+        set dst 172.18.0.0 255.255.255.254
+        set gateway 172.16.10.0
+        set device "port1"
+    next
+    edit 46
+        set dst 172.18.0.2 255.255.255.254
+        set gateway 172.16.10.2
+        set device "port2"
+    next
+end
+config log syslogd setting
+    set status enable
+    set server "10.33.40.20"
+end

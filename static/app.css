@@ -120,6 +120,7 @@ tr.notinstalled td { color: #9aa5b4; }
 .b-warn { background: var(--ret-soft); color: var(--ret); }
 .b-fw { background: #ffe4ea; color: var(--fw); }
 .b-router { background: #e6eefc; color: var(--router); }
+.b-switch { background: #e0f4f8; color: #0e7490; }
 .vendor { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
 
 .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 14px; flex-wrap: wrap; }

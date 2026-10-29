@@ -1,0 +1,99 @@
+!Command: show running-config
+!Running configuration last done at: Tue Oct 27 09:14:22 2026
+!Time: Wed Oct 28 10:02:11 2026
+
+version 10.3(4a) Bios:version 05.47
+hostname na-dc1-leaf4
+vdc na-dc1-leaf4 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+
+feature tacacs+
+feature scp-server
+feature ospf
+feature bgp
+feature interface-vlan
+feature lacp
+feature lldp
+feature bfd
+
+username admin password 5 $5$REDACTED  role network-admin
+ip domain-lookup
+ip domain-name globalcorp.example
+tacacs-server host 10.1.40.15 key 7 "REDACTED"
+aaa group server tacacs+ ISE
+    server 10.1.40.15
+    use-vrf management
+
+snmp-server contact noc@globalcorp.example
+snmp-server location NA-DC1 Ashburn
+snmp-server community REDACTED group network-operator
+ntp server 10.1.40.12 use-vrf management
+ntp server 10.33.40.12 use-vrf management
+
+vlan 1,140
+vlan 140
+  name INFRA-SERVERS
+
+spanning-tree port type edge bpduguard default
+vrf context management
+  ip route 0.0.0.0/0 192.168.10.1
+
+interface Vlan140
+  description INFRA-SERVERS
+  no shutdown
+  no ip redirects
+  ip address 10.1.40.1/24
+  ip router ospf UNDERLAY area 0.0.0.0
+  ip ospf passive-interface
+
+interface Ethernet1/1
+  description infra-servers-srv-01
+  switchport
+  switchport access vlan 140
+  spanning-tree port type edge
+  no shutdown
+
+interface Ethernet1/2
+  description infra-servers-srv-02
+  switchport
+  switchport access vlan 140
+  spanning-tree port type edge
+  no shutdown
+
+interface Ethernet1/49
+  description to na-dc1-core1 Ethernet1/4
+  no switchport
+  mtu 9216
+  ip address 172.16.3.7/31
+  ip ospf network point-to-point
+  ip router ospf UNDERLAY area 0.0.0.0
+  no shutdown
+
+interface Ethernet1/50
+  description to na-dc1-core2 Ethernet1/4
+  no switchport
+  mtu 9216
+  ip address 172.16.3.15/31
+  ip ospf network point-to-point
+  ip router ospf UNDERLAY area 0.0.0.0
+  no shutdown
+
+interface mgmt0
+  vrf member management
+  ip address 192.168.10.16/24
+
+interface loopback0
+  description ROUTER-ID
+  ip address 10.255.1.14/32
+  ip router ospf UNDERLAY area 0.0.0.0
+
+line console
+  exec-timeout 10
+line vty
+  exec-timeout 15
+  access-class VTY-ACCESS in
+router ospf UNDERLAY
+  router-id 10.255.1.14
+  log-adjacency-changes detail
+  passive-interface default

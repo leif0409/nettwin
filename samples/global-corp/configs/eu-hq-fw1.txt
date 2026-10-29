@@ -1,0 +1,249 @@
+set deviceconfig system hostname eu-hq-fw1
+set deviceconfig system ip-address 192.168.22.77
+set deviceconfig system netmask 255.255.255.0
+set deviceconfig system default-gateway 192.168.22.1
+set deviceconfig system dns-setting servers primary 10.1.40.10
+set deviceconfig system dns-setting servers secondary 10.33.40.10
+set deviceconfig system ntp-servers primary-ntp-server ntp-server-address 10.1.40.12
+set deviceconfig system timezone Europe/London
+set deviceconfig system login-banner "Authorized access only"
+set network profiles interface-management-profile PING-ONLY ping yes
+set network interface ethernet ethernet1/1 layer3 ip 172.17.10.1/31
+set network interface ethernet ethernet1/1 comment "to eu-dc1-wan1 xe-0/1/4.0"
+set network interface ethernet ethernet1/1 layer3 interface-management-profile PING-ONLY
+set network interface ethernet ethernet1/2 layer3 ip 172.17.10.3/31
+set network interface ethernet ethernet1/2 comment "to eu-dc1-wan2 xe-0/1/4.0"
+set network interface ethernet ethernet1/2 layer3 interface-management-profile PING-ONLY
+set network interface ethernet ethernet1/3 layer3 ip 10.34.0.1/29
+set network interface ethernet ethernet1/3 comment "HQ-FW-INSIDE"
+set network interface ethernet ethernet1/3 layer3 interface-management-profile PING-ONLY
+set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
+set network virtual-router default ecmp enable yes
+set network virtual-router default ecmp max-path 2
+set network virtual-router default routing-table ip static-route S-DEFAULT-1 destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route S-DEFAULT-1 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-DEFAULT-1 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-DEFAULT-1 metric 10
+set network virtual-router default routing-table ip static-route S-DEFAULT-2 destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route S-DEFAULT-2 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-DEFAULT-2 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-DEFAULT-2 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-1-0-24-3 destination 10.3.1.0/24
+set network virtual-router default routing-table ip static-route S-10-3-1-0-24-3 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-3-1-0-24-3 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-3-1-0-24-3 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-2-0-24-4 destination 10.3.2.0/24
+set network virtual-router default routing-table ip static-route S-10-3-2-0-24-4 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-3-2-0-24-4 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-3-2-0-24-4 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-3-0-24-5 destination 10.3.3.0/24
+set network virtual-router default routing-table ip static-route S-10-3-3-0-24-5 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-3-3-0-24-5 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-3-3-0-24-5 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-101-0-24-6 destination 10.3.101.0/24
+set network virtual-router default routing-table ip static-route S-10-3-101-0-24-6 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-3-101-0-24-6 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-3-101-0-24-6 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-102-0-24-7 destination 10.3.102.0/24
+set network virtual-router default routing-table ip static-route S-10-3-102-0-24-7 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-3-102-0-24-7 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-3-102-0-24-7 metric 10
+set network virtual-router default routing-table ip static-route S-10-3-103-0-24-8 destination 10.3.103.0/24
+set network virtual-router default routing-table ip static-route S-10-3-103-0-24-8 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-3-103-0-24-8 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-3-103-0-24-8 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-9 destination 10.34.0.8/31
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-9 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-9 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-9 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-10 destination 10.34.0.8/31
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-10 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-10 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-0-8-31-10 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-11 destination 10.34.10.0/24
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-11 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-11 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-11 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-12 destination 10.34.10.0/24
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-12 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-12 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-10-0-24-12 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-13 destination 10.34.20.0/24
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-13 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-13 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-13 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-14 destination 10.34.20.0/24
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-14 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-14 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-20-0-24-14 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-15 destination 10.34.50.0/24
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-15 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-15 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-15 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-16 destination 10.34.50.0/24
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-16 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-16 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-50-0-24-16 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-17 destination 10.34.99.0/24
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-17 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-17 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-17 metric 10
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-18 destination 10.34.99.0/24
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-18 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-18 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-34-99-0-24-18 metric 10
+set network virtual-router default routing-table ip static-route S-10-35-1-0-24-19 destination 10.35.1.0/24
+set network virtual-router default routing-table ip static-route S-10-35-1-0-24-19 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-35-1-0-24-19 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-35-1-0-24-19 metric 10
+set network virtual-router default routing-table ip static-route S-10-35-3-0-24-20 destination 10.35.3.0/24
+set network virtual-router default routing-table ip static-route S-10-35-3-0-24-20 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-35-3-0-24-20 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-35-3-0-24-20 metric 10
+set network virtual-router default routing-table ip static-route S-10-35-101-0-24-21 destination 10.35.101.0/24
+set network virtual-router default routing-table ip static-route S-10-35-101-0-24-21 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-35-101-0-24-21 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-35-101-0-24-21 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-1-1-32-22 destination 10.255.1.1/32
+set network virtual-router default routing-table ip static-route S-10-255-1-1-32-22 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-255-1-1-32-22 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-255-1-1-32-22 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-1-2-32-23 destination 10.255.1.2/32
+set network virtual-router default routing-table ip static-route S-10-255-1-2-32-23 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-255-1-2-32-23 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-255-1-2-32-23 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-1-31-32-24 destination 10.255.1.31/32
+set network virtual-router default routing-table ip static-route S-10-255-1-31-32-24 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-255-1-31-32-24 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-255-1-31-32-24 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-1-32-32-25 destination 10.255.1.32/32
+set network virtual-router default routing-table ip static-route S-10-255-1-32-32-25 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-255-1-32-32-25 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-255-1-32-32-25 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-1-33-32-26 destination 10.255.1.33/32
+set network virtual-router default routing-table ip static-route S-10-255-1-33-32-26 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-255-1-33-32-26 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-255-1-33-32-26 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-1-32-27 destination 10.255.2.1/32
+set network virtual-router default routing-table ip static-route S-10-255-2-1-32-27 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-255-2-1-32-27 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-255-2-1-32-27 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-2-32-28 destination 10.255.2.2/32
+set network virtual-router default routing-table ip static-route S-10-255-2-2-32-28 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-255-2-2-32-28 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-255-2-2-32-28 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-21-32-29 destination 10.255.2.21/32
+set network virtual-router default routing-table ip static-route S-10-255-2-21-32-29 nexthop ip-address 10.34.0.2
+set network virtual-router default routing-table ip static-route S-10-255-2-21-32-29 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-255-2-21-32-29 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-22-32-30 destination 10.255.2.22/32
+set network virtual-router default routing-table ip static-route S-10-255-2-22-32-30 nexthop ip-address 10.34.0.3
+set network virtual-router default routing-table ip static-route S-10-255-2-22-32-30 interface ethernet1/3
+set network virtual-router default routing-table ip static-route S-10-255-2-22-32-30 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-31-32-31 destination 10.255.2.31/32
+set network virtual-router default routing-table ip static-route S-10-255-2-31-32-31 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-10-255-2-31-32-31 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-10-255-2-31-32-31 metric 10
+set network virtual-router default routing-table ip static-route S-10-255-2-32-32-32 destination 10.255.2.32/32
+set network virtual-router default routing-table ip static-route S-10-255-2-32-32-32 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-10-255-2-32-32-32 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-10-255-2-32-32-32 metric 10
+set network virtual-router default routing-table ip static-route S-172-16-10-0-31-33 destination 172.16.10.0/31
+set network virtual-router default routing-table ip static-route S-172-16-10-0-31-33 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-16-10-0-31-33 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-16-10-0-31-33 metric 10
+set network virtual-router default routing-table ip static-route S-172-16-10-2-31-34 destination 172.16.10.2/31
+set network virtual-router default routing-table ip static-route S-172-16-10-2-31-34 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-172-16-10-2-31-34 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-172-16-10-2-31-34 metric 10
+set network virtual-router default routing-table ip static-route S-172-16-20-0-31-35 destination 172.16.20.0/31
+set network virtual-router default routing-table ip static-route S-172-16-20-0-31-35 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-16-20-0-31-35 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-16-20-0-31-35 metric 10
+set network virtual-router default routing-table ip static-route S-172-16-20-2-31-36 destination 172.16.20.2/31
+set network virtual-router default routing-table ip static-route S-172-16-20-2-31-36 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-172-16-20-2-31-36 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-172-16-20-2-31-36 metric 10
+set network virtual-router default routing-table ip static-route S-172-16-20-4-31-37 destination 172.16.20.4/31
+set network virtual-router default routing-table ip static-route S-172-16-20-4-31-37 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-16-20-4-31-37 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-16-20-4-31-37 metric 10
+set network virtual-router default routing-table ip static-route S-172-17-20-0-31-38 destination 172.17.20.0/31
+set network virtual-router default routing-table ip static-route S-172-17-20-0-31-38 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-17-20-0-31-38 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-17-20-0-31-38 metric 10
+set network virtual-router default routing-table ip static-route S-172-17-20-2-31-39 destination 172.17.20.2/31
+set network virtual-router default routing-table ip static-route S-172-17-20-2-31-39 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-172-17-20-2-31-39 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-172-17-20-2-31-39 metric 10
+set network virtual-router default routing-table ip static-route S-172-17-20-4-31-40 destination 172.17.20.4/31
+set network virtual-router default routing-table ip static-route S-172-17-20-4-31-40 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-17-20-4-31-40 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-17-20-4-31-40 metric 10
+set network virtual-router default routing-table ip static-route S-172-18-0-0-31-41 destination 172.18.0.0/31
+set network virtual-router default routing-table ip static-route S-172-18-0-0-31-41 nexthop ip-address 172.17.10.0
+set network virtual-router default routing-table ip static-route S-172-18-0-0-31-41 interface ethernet1/1
+set network virtual-router default routing-table ip static-route S-172-18-0-0-31-41 metric 10
+set network virtual-router default routing-table ip static-route S-172-18-0-2-31-42 destination 172.18.0.2/31
+set network virtual-router default routing-table ip static-route S-172-18-0-2-31-42 nexthop ip-address 172.17.10.2
+set network virtual-router default routing-table ip static-route S-172-18-0-2-31-42 interface ethernet1/2
+set network virtual-router default routing-table ip static-route S-172-18-0-2-31-42 metric 10
+set zone wan network layer3 [ ethernet1/1 ethernet1/2 ]
+set zone lan network layer3 ethernet1/3
+set tag NA color color3
+set tag EMEA color color5
+set tag DC color color1
+set address corp-all ip-netmask 10.0.0.0/8
+set address corp-all tag [ NA ]
+set address eu-br-voice ip-netmask 10.35.101.0/24
+set address eu-br-voice tag [ EMEA ]
+set address eu-hq-it ip-netmask 10.34.50.0/24
+set address eu-hq-it tag [ EMEA ]
+set address eu-hq-users ip-netmask 10.34.10.0/24
+set address eu-hq-users tag [ EMEA ]
+set address eu-hq-voice ip-netmask 10.34.20.0/24
+set address eu-hq-voice tag [ EMEA ]
+set address na-br-voice ip-netmask 10.3.100.0/22
+set address na-br-voice tag [ NA ]
+set address na-hq-voice ip-netmask 10.2.20.0/24
+set address na-hq-voice tag [ NA ]
+set address-group corp-voice static [ na-hq-voice na-br-voice eu-hq-voice eu-br-voice ]
+set service svc-sip protocol udp port 5060
+set service svc-rtp protocol udp port 16384-32767
+set rulebase security rules users-web from lan
+set rulebase security rules users-web to wan
+set rulebase security rules users-web source [ eu-hq-users eu-hq-it ]
+set rulebase security rules users-web destination any
+set rulebase security rules users-web application [ ssl web-browsing dns ]
+set rulebase security rules users-web service application-default
+set rulebase security rules users-web action allow
+set rulebase security rules users-web log-setting default
+set rulebase security rules users-web profile-setting group default
+set rulebase security rules it-admin from lan
+set rulebase security rules it-admin to wan
+set rulebase security rules it-admin source eu-hq-it
+set rulebase security rules it-admin destination corp-all
+set rulebase security rules it-admin application [ ssh ms-rdp snmp ]
+set rulebase security rules it-admin service application-default
+set rulebase security rules it-admin action allow
+set rulebase security rules it-admin log-setting default
+set rulebase security rules it-admin profile-setting group default
+set rulebase security rules voice-out from lan
+set rulebase security rules voice-out to wan
+set rulebase security rules voice-out source eu-hq-voice
+set rulebase security rules voice-out destination corp-voice
+set rulebase security rules voice-out application any
+set rulebase security rules voice-out service [ svc-sip svc-rtp ]
+set rulebase security rules voice-out action allow
+set rulebase security rules voice-out log-setting default
+set rulebase security rules voice-out profile-setting group default
+set rulebase security rules voice-in from wan
+set rulebase security rules voice-in to lan
+set rulebase security rules voice-in source corp-voice
+set rulebase security rules voice-in destination eu-hq-voice
+set rulebase security rules voice-in application any
+set rulebase security rules voice-in service [ svc-sip svc-rtp ]
+set rulebase security rules voice-in action allow
+set rulebase security rules voice-in log-setting default
+set rulebase security rules voice-in profile-setting group default
+set shared log-settings syslog SIEM server SIEM-1 server 10.33.40.20

@@ -1,0 +1,284 @@
+IP Route Table for VRF "default"
+'*' denotes best ucast next-hop
+'**' denotes best mcast next-hop
+'[x/y]' denotes [preference/metric]
+'%<string>' in via output denotes VRF <string>
+
+0.0.0.0/0, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.1.10.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.1.20.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.1.30.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.1.40.0/24, ubest/mbest: 1/0, attached
+    *via 10.1.40.1, Vlan140, [0/0], 3w2d, direct
+10.1.40.1/32, ubest/mbest: 1/0, attached
+    *via 10.1.40.1, Vlan140, [0/0], 3w2d, local
+10.1.200.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+10.2.0.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/161], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/161], 3w2d, ospf-UNDERLAY, intra
+10.2.0.8/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.10.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.20.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.30.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.40.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.50.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.2.99.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.3.1.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.3.2.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.3.3.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.3.101.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.3.102.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.3.103.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.33.10.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.33.20.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.33.30.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.33.40.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.33.200.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.0.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.0.8/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.10.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.20.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.50.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.34.99.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.35.1.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.35.3.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.35.101.0/24, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.1.1/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+10.255.1.2/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+10.255.1.3/32, ubest/mbest: 1/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+10.255.1.4/32, ubest/mbest: 1/0
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+10.255.1.11/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.255.1.12/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.255.1.13/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+10.255.1.14/32, ubest/mbest: 1/0, attached
+    *via 10.255.1.14, Lo0, [0/0], 3w2d, direct
+10.255.1.21/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.255.1.22/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/201], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/201], 3w2d, ospf-UNDERLAY, intra
+10.255.1.31/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.1.32/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.1.33/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.1/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.2/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.3/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.4/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.11/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.12/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.21/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.22/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.31/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+10.255.2.32/32, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.16.0.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+172.16.1.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/81], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/81], 3w2d, ospf-UNDERLAY, intra
+172.16.1.8/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.2.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.0/31, ubest/mbest: 1/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.2/31, ubest/mbest: 1/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.4/31, ubest/mbest: 1/0
+    *via 172.16.3.6, Eth1/49, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.6/31, ubest/mbest: 1/0, attached
+    *via 172.16.3.7, Eth1/49, [0/0], 3w2d, direct
+172.16.3.7/32, ubest/mbest: 1/0, attached
+    *via 172.16.3.7, Eth1/49, [0/0], 3w2d, local
+172.16.3.8/31, ubest/mbest: 1/0
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.10/31, ubest/mbest: 1/0
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.12/31, ubest/mbest: 1/0
+    *via 172.16.3.14, Eth1/50, [110/41], 3w2d, ospf-UNDERLAY, intra
+172.16.3.14/31, ubest/mbest: 1/0, attached
+    *via 172.16.3.15, Eth1/50, [0/0], 3w2d, direct
+172.16.3.15/32, ubest/mbest: 1/0, attached
+    *via 172.16.3.15, Eth1/50, [0/0], 3w2d, local
+172.16.10.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+172.16.10.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+172.16.20.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.16.20.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.16.20.4/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.0.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.1.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.1.8/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.2.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.3.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.3.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.3.4/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.3.6/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.10.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.10.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.20.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.20.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.17.20.4/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+172.18.0.0/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+172.18.0.2/31, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+198.51.100.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/20], 3w2d, ospf-UNDERLAY, type-2
+    *via 172.16.3.14, Eth1/50, [110/20], 3w2d, ospf-UNDERLAY, type-2
+203.0.113.0/29, ubest/mbest: 2/0
+    *via 172.16.3.6, Eth1/49, [110/121], 3w2d, ospf-UNDERLAY, intra
+    *via 172.16.3.14, Eth1/50, [110/121], 3w2d, ospf-UNDERLAY, intra
+
+IP Route Table for VRF "management"
+'*' denotes best ucast next-hop
+'**' denotes best mcast next-hop
+'[x/y]' denotes [preference/metric]
+'%<string>' in via output denotes VRF <string>
+
+0.0.0.0/0, ubest/mbest: 1/0
+    *via 192.168.10.1, [1/0], 3w2d, static
+192.168.10.0/24, ubest/mbest: 1/0, attached
+    *via 192.168.10.16, mgmt0, [0/0], 3w2d, direct

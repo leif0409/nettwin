@@ -1,0 +1,192 @@
+!
+! Last configuration change at 09:14:22 UTC Tue Oct 27 2026 by netadmin
+! NVRAM config last updated at 09:14:25 UTC Tue Oct 27 2026 by netadmin
+!
+version 17.9
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no service pad
+platform punt-keepalive disable-kernel-core
+!
+hostname eu-hq-core1
+!
+boot-start-marker
+boot system bootflash:packages.conf
+boot-end-marker
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 64000 informational
+no logging console
+enable secret 9 $9$REDACTED$REDACTED
+!
+aaa new-model
+!
+aaa group server tacacs+ ISE
+ server name ISE-1
+ ip vrf forwarding Mgmt-intf
+!
+aaa authentication login default group ISE local
+aaa authorization exec default group ISE local
+aaa accounting commands 15 default start-stop group ISE
+!
+aaa session-id common
+clock timezone CET 1 0
+!
+ip domain name globalcorp.example
+no ip domain lookup
+ip name-server 10.1.40.10 10.33.40.10
+!
+login on-success log
+!
+vtp mode transparent
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+vlan 10
+ name USERS
+!
+vlan 20
+ name VOICE
+!
+vlan 50
+ name IT
+!
+vlan 99
+ name MGMT
+!
+username netadmin privilege 15 secret 9 $9$REDACTED$REDACTED
+!
+redundancy
+ mode sso
+!
+interface Loopback0
+ description ROUTER-ID
+ ip address 10.255.2.21 255.255.255.255
+!
+interface TenGigabitEthernet1/0/1
+ description HQ-FW-INSIDE
+ no switchport
+ ip address 10.34.0.2 255.255.255.248
+!
+interface TenGigabitEthernet1/0/2
+ description to eu-hq-core2 TenGigabitEthernet1/0/2
+ no switchport
+ ip address 10.34.0.8 255.255.255.254
+ ip ospf network point-to-point
+!
+interface Vlan10
+ description USERS
+ ip address 10.34.10.2 255.255.255.0
+ standby version 2
+ standby 10 ip 10.34.10.1
+ standby 10 priority 110
+ standby 10 preempt
+!
+interface Vlan20
+ description VOICE
+ ip address 10.34.20.2 255.255.255.0
+ standby version 2
+ standby 20 ip 10.34.20.1
+ standby 20 priority 110
+ standby 20 preempt
+!
+interface Vlan50
+ description IT
+ ip address 10.34.50.2 255.255.255.0
+ standby version 2
+ standby 50 ip 10.34.50.1
+ standby 50 priority 110
+ standby 50 preempt
+!
+interface Vlan99
+ description MGMT
+ ip address 10.34.99.2 255.255.255.0
+ standby version 2
+ standby 99 ip 10.34.99.1
+ standby 99 priority 110
+ standby 99 preempt
+!
+interface GigabitEthernet0/0
+ description OOB-MGMT
+ vrf forwarding Mgmt-intf
+ ip address 192.168.21.21 255.255.255.0
+ negotiation auto
+!
+interface TenGigabitEthernet1/0/3
+ description TRUNK
+ switchport trunk allowed vlan 10,20,30,40,50,99
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/4
+ description TRUNK
+ switchport trunk allowed vlan 10,20,30,40,50,99
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/5
+ description TRUNK
+ switchport trunk allowed vlan 10,20,30,40,50,99
+ switchport mode trunk
+!
+router ospf 1
+ router-id 10.255.2.21
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/0/1
+ no passive-interface TenGigabitEthernet1/0/2
+ network 10.255.2.21 0.0.0.0 area 0
+ network 10.34.0.0 0.0.0.7 area 0
+ network 10.34.0.8 0.0.0.1 area 0
+ network 10.34.10.0 0.0.0.255 area 0
+ network 10.34.20.0 0.0.0.255 area 0
+ network 10.34.50.0 0.0.0.255 area 0
+ network 10.34.99.0 0.0.0.255 area 0
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 192.168.21.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard VTY-ACCESS
+ 10 permit 10.1.40.0 0.0.0.255
+ 20 permit 10.33.40.0 0.0.0.255
+ 30 permit 192.168.0.0 0.0.255.255
+ 40 deny   any log
+!
+logging source-interface GigabitEthernet0 vrf Mgmt-intf
+logging host 10.1.40.20
+logging host 10.33.40.20
+!
+snmp-server community REDACTED RO VTY-ACCESS
+snmp-server location EU-HQ London
+snmp-server contact noc@globalcorp.example
+snmp-server enable traps
+!
+tacacs server ISE-1
+ address ipv4 10.1.40.15
+ key 7 REDACTED
+!
+banner motd ^C
+*** eu-hq-core1 - GlobalCorp EMEA - authorized access only ***
+^C
+!
+line con 0
+ exec-timeout 10 0
+ stopbits 1
+line vty 0 15
+ access-class VTY-ACCESS in vrf-also
+ exec-timeout 15 0
+ transport input ssh
+!
+ntp server 10.1.40.12
+ntp server 10.33.40.12
+!
+end

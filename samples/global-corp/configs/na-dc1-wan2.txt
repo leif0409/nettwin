@@ -1,0 +1,184 @@
+!
+! Last configuration change at 09:14:22 UTC Tue Oct 27 2026 by netadmin
+! NVRAM config last updated at 09:14:25 UTC Tue Oct 27 2026 by netadmin
+!
+version 17.9
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no service pad
+platform punt-keepalive disable-kernel-core
+!
+hostname na-dc1-wan2
+!
+boot-start-marker
+boot system bootflash:packages.conf
+boot-end-marker
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 64000 informational
+no logging console
+enable secret 9 $9$REDACTED$REDACTED
+!
+aaa new-model
+!
+aaa group server tacacs+ ISE
+ server name ISE-1
+ ip vrf forwarding Mgmt-intf
+!
+aaa authentication login default group ISE local
+aaa authorization exec default group ISE local
+aaa accounting commands 15 default start-stop group ISE
+!
+aaa session-id common
+clock timezone EST -5 0
+!
+ip domain name globalcorp.example
+no ip domain lookup
+ip name-server 10.1.40.10 10.33.40.10
+!
+login on-success log
+!
+username netadmin privilege 15 secret 9 $9$REDACTED$REDACTED
+!
+redundancy
+ mode sso
+!
+interface Loopback0
+ description ROUTER-ID
+ ip address 10.255.1.2 255.255.255.255
+!
+interface TenGigabitEthernet0/1/2
+ description to na-dc1-wan1 TenGigabitEthernet0/1/2
+ ip address 172.16.0.1 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+interface TenGigabitEthernet0/1/0
+ description DC1-TRANSIT
+ ip address 172.16.1.2 255.255.255.248
+ negotiation auto
+!
+interface GigabitEthernet0
+ description OOB-MGMT
+ vrf forwarding Mgmt-intf
+ ip address 192.168.11.12 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet0/0/4
+ description to na-hq-fw1 port2
+ ip address 172.16.10.2 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+interface GigabitEthernet0/0/7
+ description LEGACY-BACKUP-TO-HQ (decom pending)
+ ip address 172.16.99.1 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+interface GigabitEthernet0/0/2
+ description BR-TOR-MPLS-CKT
+ ip address 172.16.20.2 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+interface HundredGigE0/2/0
+ description DCI-TO-EU-DC1-WAN2 (ATL-FRA-02)
+ ip address 172.18.0.2 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+router ospf 1
+ router-id 10.255.1.2
+ passive-interface default
+ no passive-interface TenGigabitEthernet0/1/2
+ no passive-interface TenGigabitEthernet0/1/0
+ no passive-interface GigabitEthernet0/0/4
+ no passive-interface GigabitEthernet0/0/2
+ no passive-interface HundredGigE0/2/0
+ network 10.255.1.2 0.0.0.0 area 0
+ network 172.16.0.0 0.0.0.1 area 0
+ network 172.16.1.0 0.0.0.7 area 0
+ network 172.16.10.2 0.0.0.1 area 0
+ network 172.16.20.2 0.0.0.1 area 0
+ network 172.18.0.2 0.0.0.1 area 0
+ redistribute bgp 65010 metric-type 2 subnets route-map BGP-TO-OSPF
+ default-information originate
+!
+router bgp 65010
+ bgp router-id 10.255.1.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 172.16.20.3 remote-as 65102
+ neighbor 172.16.20.3 description na-br-tor-rtr1
+ neighbor 172.18.0.3 remote-as 65020
+ neighbor 172.18.0.3 description eu-dc1-wan2
+ !
+ address-family ipv4
+  network 10.255.1.2 mask 255.255.255.255
+  redistribute ospf 1 match internal external 2 route-map OSPF-TO-BGP
+  neighbor 172.16.20.3 activate
+  neighbor 172.16.20.3 send-community both
+  neighbor 172.16.20.3 soft-reconfiguration inbound
+  neighbor 172.18.0.3 activate
+  neighbor 172.18.0.3 send-community both
+  neighbor 172.18.0.3 soft-reconfiguration inbound
+  maximum-paths 2
+ exit-address-family
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 192.168.11.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard VTY-ACCESS
+ 10 permit 10.1.40.0 0.0.0.255
+ 20 permit 10.33.40.0 0.0.0.255
+ 30 permit 192.168.0.0 0.0.255.255
+ 40 deny   any log
+!
+route-map OSPF-TO-BGP permit 10
+ match ip address prefix-list CORP-AGGREGATES
+!
+route-map BGP-TO-OSPF permit 10
+!
+ip prefix-list CORP-AGGREGATES seq 5 permit 10.0.0.0/8 le 32
+!
+logging source-interface GigabitEthernet0 vrf Mgmt-intf
+logging host 10.1.40.20
+logging host 10.33.40.20
+!
+snmp-server community REDACTED RO VTY-ACCESS
+snmp-server location NA-DC1 Ashburn
+snmp-server contact noc@globalcorp.example
+snmp-server enable traps
+!
+tacacs server ISE-1
+ address ipv4 10.1.40.15
+ key 7 REDACTED
+!
+banner motd ^C
+*** na-dc1-wan2 - GlobalCorp NA - authorized access only ***
+^C
+!
+line con 0
+ exec-timeout 10 0
+ stopbits 1
+line vty 0 15
+ access-class VTY-ACCESS in vrf-also
+ exec-timeout 15 0
+ transport input ssh
+!
+ntp server 10.1.40.12
+ntp server 10.33.40.12
+!
+end

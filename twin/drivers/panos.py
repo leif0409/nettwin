@@ -99,11 +99,15 @@ class PanOSDriver(Driver):
                         r["iface"] = rest[1]
                     elif rest[0] == "admin-dist":
                         r["ad"] = int(rest[1])
+                    elif rest[0] in ("metric", "route-table", "bfd", "path-monitor"):
+                        pass  # no effect on which way traffic goes in this model
                     else:
                         unsupported.append(f"static-route {t[6]} {' '.join(rest)}")
                 elif t[0] == "address" and len(t) >= 4:
                     name, kind, val = t[1], t[2], t[3]
-                    if kind == "ip-netmask":
+                    if kind in ("description", "tag"):
+                        pass  # annotations; the object's value is on its ip-netmask / ip-range line
+                    elif kind == "ip-netmask":
                         raw_addrs[name] = [IPv4Network(val if "/" in val else f"{val}/32", strict=False)]
                     elif kind == "ip-range":
                         lo, hi = val.split("-")

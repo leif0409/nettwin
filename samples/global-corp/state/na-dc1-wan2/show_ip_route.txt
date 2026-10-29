@@ -1,0 +1,147 @@
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, m - OMP
+       n - NAT, Ni - NAT inside, No - NAT outside, Nd - NAT DIA
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       H - NHRP, G - NHRP registered, g - NHRP registration summary
+       o - ODR, P - periodic downloaded static route, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+       & - replicated local route overrides by connected
+
+Gateway of last resort is 172.16.1.4 to network 0.0.0.0
+
+O*E2     0.0.0.0/0 [110/20] via 172.16.1.4, 3w2d, TenGigabitEthernet0/1/0
+      10.0.0.0/8 is variably subnetted, 56 subnets, 4 masks
+O        10.1.10.0/24 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.1.20.0/24 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.1.30.0/24 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.1.40.0/24 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.1.200.0/24 [110/2] via 172.16.1.4, 3w2d, TenGigabitEthernet0/1/0
+O        10.2.0.0/29 [110/2] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.0.8/31 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.10.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.20.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.30.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.40.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.50.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.2.99.0/24 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+B        10.3.1.0/24 [20/0] via 172.16.1.1, 3w2d
+                     [20/0] via 172.16.0.0, 3w2d
+B        10.3.2.0/24 [20/0] via 172.16.20.3, 3w2d
+B        10.3.3.0/24 [20/0] via 172.16.1.1, 3w2d
+                     [20/0] via 172.16.0.0, 3w2d
+B        10.3.101.0/24 [20/0] via 172.16.1.1, 3w2d
+                       [20/0] via 172.16.0.0, 3w2d
+B        10.3.102.0/24 [20/0] via 172.16.20.3, 3w2d
+B        10.3.103.0/24 [20/0] via 172.16.1.1, 3w2d
+                       [20/0] via 172.16.0.0, 3w2d
+B        10.33.10.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.33.20.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.33.30.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.33.40.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.33.200.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.34.0.0/29 [20/0] via 172.18.0.3, 3w2d
+B        10.34.0.8/31 [20/0] via 172.18.0.3, 3w2d
+B        10.34.10.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.34.20.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.34.50.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.34.99.0/24 [20/0] via 172.18.0.3, 3w2d
+B        10.35.1.0/24 [20/0] via 172.18.0.3, 3w2d
+                      [20/0] via 172.16.1.1, 3w2d
+                      [20/0] via 172.16.0.0, 3w2d
+B        10.35.3.0/24 [20/0] via 172.18.0.3, 3w2d
+                      [20/0] via 172.16.1.1, 3w2d
+                      [20/0] via 172.16.0.0, 3w2d
+B        10.35.101.0/24 [20/0] via 172.18.0.3, 3w2d
+                        [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+O        10.255.1.1/32 [110/2] via 172.16.1.1, 3w2d, TenGigabitEthernet0/1/0
+                       [110/2] via 172.16.0.0, 3w2d, TenGigabitEthernet0/1/2
+C        10.255.1.2/32 is directly connected, Loopback0
+O        10.255.1.3/32 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.4/32 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.11/32 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.12/32 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.13/32 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.14/32 [110/4] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        10.255.1.21/32 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+O        10.255.1.22/32 [110/3] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+B        10.255.1.31/32 [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+B        10.255.1.32/32 [20/0] via 172.16.20.3, 3w2d
+B        10.255.1.33/32 [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+B        10.255.2.1/32 [20/0] via 172.18.0.3, 3w2d
+                       [20/0] via 172.16.1.1, 3w2d
+                       [20/0] via 172.16.0.0, 3w2d
+B        10.255.2.2/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.3/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.4/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.11/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.12/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.21/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.22/32 [20/0] via 172.18.0.3, 3w2d
+B        10.255.2.31/32 [20/0] via 172.18.0.3, 3w2d
+                        [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+B        10.255.2.32/32 [20/0] via 172.18.0.3, 3w2d
+      172.16.0.0/16 is variably subnetted, 23 subnets, 3 masks
+C        172.16.0.0/31 is directly connected, TenGigabitEthernet0/1/2
+L        172.16.0.1/32 is directly connected, TenGigabitEthernet0/1/2
+C        172.16.1.0/29 is directly connected, TenGigabitEthernet0/1/0
+L        172.16.1.2/32 is directly connected, TenGigabitEthernet0/1/0
+O        172.16.1.8/29 [110/2] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.2.0/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.0/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.2/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.4/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.6/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.8/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.10/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.12/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.3.14/31 [110/3] via 172.16.1.3, 3w2d, TenGigabitEthernet0/1/0
+O        172.16.10.0/31 [110/2] via 172.16.10.3, 3w2d, GigabitEthernet0/0/4
+                        [110/2] via 172.16.1.1, 3w2d, TenGigabitEthernet0/1/0
+                        [110/2] via 172.16.0.0, 3w2d, TenGigabitEthernet0/1/2
+C        172.16.10.2/31 is directly connected, GigabitEthernet0/0/4
+L        172.16.10.2/32 is directly connected, GigabitEthernet0/0/4
+B        172.16.20.0/31 [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+C        172.16.20.2/31 is directly connected, GigabitEthernet0/0/2
+L        172.16.20.2/32 is directly connected, GigabitEthernet0/0/2
+B        172.16.20.4/31 [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+C        172.16.99.0/31 is directly connected, GigabitEthernet0/0/7
+L        172.16.99.1/32 is directly connected, GigabitEthernet0/0/7
+      172.17.0.0/16 is variably subnetted, 13 subnets, 2 masks
+B        172.17.0.0/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.1.0/29 [20/0] via 172.18.0.3, 3w2d
+B        172.17.1.8/29 [20/0] via 172.18.0.3, 3w2d
+B        172.17.2.0/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.3.0/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.3.2/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.3.4/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.3.6/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.10.0/31 [20/0] via 172.18.0.3, 3w2d
+                        [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+B        172.17.10.2/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.20.0/31 [20/0] via 172.18.0.3, 3w2d
+                        [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+B        172.17.20.2/31 [20/0] via 172.18.0.3, 3w2d
+B        172.17.20.4/31 [20/0] via 172.18.0.3, 3w2d
+                        [20/0] via 172.16.1.1, 3w2d
+                        [20/0] via 172.16.0.0, 3w2d
+      172.18.0.0/16 is variably subnetted, 3 subnets, 2 masks
+O        172.18.0.0/31 [110/2] via 172.16.1.1, 3w2d, TenGigabitEthernet0/1/0
+                       [110/2] via 172.16.0.0, 3w2d, TenGigabitEthernet0/1/2
+C        172.18.0.2/31 is directly connected, HundredGigE0/2/0
+L        172.18.0.2/32 is directly connected, HundredGigE0/2/0
+      198.51.100.0/29 is subnetted, 1 subnets
+B        198.51.100.0 [20/0] via 172.18.0.3, 3w2d
+      203.0.113.0/29 is subnetted, 1 subnets
+O        203.0.113.0 [110/2] via 172.16.1.4, 3w2d, TenGigabitEthernet0/1/0

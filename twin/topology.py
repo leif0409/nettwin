@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from ipaddress import IPv4Network
 
-from twin.model import Network
+from twin.model import MANAGEMENT_VRFS, Network
 
 
 @dataclass
@@ -24,21 +24,25 @@ def subnet_id(net: IPv4Network) -> str:
 def build_topology(network: Network) -> Topology:
     topo = Topology()
     attached: dict[IPv4Network, list[tuple[str, str]]] = defaultdict(list)
+    fhrp_lans: set[IPv4Network] = set()  # subnets with an HSRP/VRRP gateway: a LAN, not a link
     for dev in network.devices.values():
         topo.nodes.append({
             "id": dev.name, "kind": dev.role, "vendor": dev.vendor,
             "site": dev.vendor_extra.get("site", ""), "pos": dev.vendor_extra.get("pos"),
         })
         for i in dev.interfaces:
-            if i.enabled and i.ip is not None:
+            # Out-of-band management ports would tie every device to one segment; leave them off the map.
+            if i.enabled and i.ip is not None and i.vrf.lower() not in MANAGEMENT_VRFS:
                 attached[i.ip.network].append((dev.name, i.name))
+                if i.vip is not None:
+                    fhrp_lans.add(i.ip.network)
 
     for net, ends in sorted(attached.items()):
         if net.prefixlen == 32 and len(ends) == 1:
             continue  # a loopback: an address on the device, not something to draw
         # One device: an edge LAN. Three or more: a shared segment (a switch/VLAN between them),
         # drawn as one node rather than a full mesh of links.
-        if len({d for d, _ in ends}) != 2:
+        if len({d for d, _ in ends}) != 2 or net in fhrp_lans:
             node = {"id": subnet_id(net), "kind": "subnet", "label": str(net), "attached_to": ends[0][0]}
             if len(ends) > 1:
                 node["segment"] = True

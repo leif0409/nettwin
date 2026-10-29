@@ -107,6 +107,9 @@ class Twin:
             for i in dev.interfaces:
                 if i.enabled and i.ip is not None:
                     self._owner[i.ip.ip] = (dev.name, i.name)
+        # An HSRP/VRRP virtual IP belongs to whichever device is active for it.
+        for vip, (dev_name, if_name) in self._active_gateways().items():
+            self._owner.setdefault(vip, (dev_name, if_name))
         # id(route) -> [(egress interface, adjacent next-hop IP or None)], after recursive resolution
         self._res: dict[int, list[tuple[str, IPv4Address | None]]] = {}
         self._rib = {name: self._build_rib(dev) for name, dev in network.devices.items()}
@@ -181,10 +184,23 @@ class Twin:
         best = min(r.admin_distance for r in cands)
         return [r for r in cands if r.admin_distance == best]
 
+    def _active_gateways(self) -> dict[IPv4Address, tuple[str, str]]:
+        """vip -> (device, interface) of the active HSRP/VRRP member: highest priority, then highest
+        interface IP (the tie-break both protocols use)."""
+        best: dict[IPv4Address, tuple[tuple[int, IPv4Address], str, str]] = {}
+        for dev in self.network.devices.values():
+            for i in dev.interfaces:
+                if i.enabled and i.ip is not None and i.vip is not None:
+                    rank = (i.fhrp_priority, i.ip.ip)
+                    if i.vip not in best or rank > best[i.vip][0]:
+                        best[i.vip] = (rank, dev.name, i.name)
+        return {vip: (d, n) for vip, (_, d, n) in best.items()}
+
     def ingress_for(self, ip: IPv4Address) -> list[tuple[str, str]]:
-        """First-hop devices: those with an up interface whose connected subnet holds `ip` (most specific wins)."""
+        """First-hop devices: those with an up interface whose connected subnet holds `ip` (most
+        specific wins). Where the subnet has an HSRP/VRRP gateway, only the active member forwards."""
         hits = [
-            (i.ip.network.prefixlen, dev.name, i.name)
+            (i.ip.network.prefixlen, dev.name, i)
             for dev in self.network.devices.values()
             for i in dev.interfaces
             if i.enabled and i.ip is not None and ip in i.ip.network
@@ -192,7 +208,13 @@ class Twin:
         if not hits:
             return []
         longest = max(h[0] for h in hits)
-        return [(d, i) for plen, d, i in sorted(hits) if plen == longest]
+        hits = [(d, i) for plen, d, i in hits if plen == longest]
+        vips = {i.vip for _, i in hits if i.vip is not None}
+        if vips:
+            active = self._active_gateways()
+            gateways = [active[v] for v in sorted(vips)]
+            return sorted(set(gateways))
+        return sorted((d, i.name) for d, i in hits)
 
     def trace(self, src: IPv4Address, dst: IPv4Address) -> list[Path]:
         starts = self.ingress_for(src)
@@ -303,15 +325,18 @@ class Twin:
             if not p.delivered:
                 add(REVERSE_UNREACHABLE, p.hops[-1].device if p.hops else None, p.detail)
 
-        # Stateful firewalls need the reply to come back through them. Compare the
-        # sets of firewalls on delivered forward and return paths.
-        fwd = {fw for p in rep.forward if p.delivered for fw in p.firewalls}
-        rev = {fw for p in rep.reverse if p.delivered for fw in p.firewalls}
-        if any(p.delivered for p in rep.reverse):
-            for fw in sorted(fwd - rev):
-                add(ASYMMETRIC_BYPASS, fw, f"request crosses {fw} but the reply does not; stateful session breaks")
-            for fw in sorted(rev - fwd):
-                add(ASYMMETRIC_NO_SESSION, fw, f"reply crosses {fw}, which never saw the request; reply is dropped")
+        # Stateful firewalls need the reply to come back through them. With ECMP the request
+        # can take any forward path and the reply any return path, so compare every pair.
+        fwd_ok = [p for p in rep.forward if p.delivered]
+        rev_ok = [p for p in rep.reverse if p.delivered]
+        multi = len(fwd_ok) > 1 or len(rev_ok) > 1
+        note = " on at least one of the equal-cost paths" if multi else ""
+        for f in fwd_ok:
+            for r in rev_ok:
+                for fw in sorted(set(f.firewalls) - set(r.firewalls)):
+                    add(ASYMMETRIC_BYPASS, fw, f"request crosses {fw} but the reply does not{note}; stateful session breaks")
+                for fw in sorted(set(r.firewalls) - set(f.firewalls)):
+                    add(ASYMMETRIC_NO_SESSION, fw, f"reply crosses {fw}, which never saw the request{note}; reply is dropped")
 
         rep.issues = list(issues.values())
         return rep

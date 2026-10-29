@@ -35,6 +35,34 @@ ip route 0.0.0.0 0.0.0.0 172.20.5.2
 !
 end
 """},
+    "cisco_nxos": {"label": "Cisco NX-OS", "ext": ".cfg", "example": """hostname dc-leaf9
+feature ospf
+feature interface-vlan
+
+vlan 150
+  name NEW-SERVERS
+
+vrf context management
+  ip route 0.0.0.0/0 192.168.10.1
+
+interface Vlan150
+  description NEW-SERVERS
+  no shutdown
+  ip address 10.1.50.1/24
+
+interface Ethernet1/49
+  description to core1
+  no switchport
+  ip address 172.16.3.17/31
+  no shutdown
+
+interface mgmt0
+  vrf member management
+  ip address 192.168.10.29/24
+
+interface loopback0
+  ip address 10.255.1.19/32
+"""},
     "junos": {"label": "Juniper Junos (display set)", "ext": ".conf", "example": """set system host-name BR6
 set interfaces ge-0/0/0 unit 0 family inet address 10.16.0.1/24
 set interfaces ge-0/0/0 description "BR6-USERS"

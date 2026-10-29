@@ -50,7 +50,7 @@ const ISSUE = {
   ASYMMETRIC_NO_SESSION: { title: "Asymmetric: reply hits firewall with no session", cls: "b-crit" },
 };
 const issueBadge = (k) => `<span class="badge ${(ISSUE[k] || {}).cls || "b-info"}">${esc((ISSUE[k] || {}).title || k)}</span>`;
-const roleBadge = (role) => `<span class="badge ${role === "firewall" ? "b-fw" : "b-router"}">${esc(role)}</span>`;
+const roleBadge = (role) => `<span class="badge ${role === "firewall" ? "b-fw" : role === "switch" ? "b-switch" : "b-router"}">${esc(role)}</span>`;
 const sevBadge = (s) => `<span class="badge ${{ high: "b-crit", medium: "b-bad", low: "b-warn", info: "b-info" }[s]}">${esc(s)}</span>`;
 
 function parseHash() {
@@ -114,6 +114,7 @@ function renderMap(container, topo, onTap) {
       } },
       { selector: "node[kind='router']", style: { shape: "ellipse", width: 44, height: 44, "background-color": "#2563eb" } },
       { selector: "node[kind='firewall']", style: { shape: "round-rectangle", width: 50, height: 38, "background-color": "#e11d48" } },
+      { selector: "node[kind='switch']", style: { shape: "rectangle", width: 44, height: 30, "background-color": "#0891b2" } },
       { selector: "node[kind='subnet']", style: {
         shape: "round-rectangle", "background-color": "#eef2f6", "border-width": 1, "border-color": "#c3ccd8",
         width: "label", height: 22, padding: 8, "text-valign": "center", "text-margin-y": 0,
@@ -161,6 +162,7 @@ function highlight(cy, paths) {
 
 const legend = `<div class="legend">
   <span><i style="background:#2563eb;border-radius:50%"></i>Router</span>
+  <span><i style="background:#0891b2;border-radius:0"></i>Switch</span>
   <span><i style="background:#e11d48"></i>Firewall</span>
   <span><i style="background:#eef2f6;border:1px solid #c3ccd8"></i>Subnet</span>
 </div>`;
@@ -704,7 +706,20 @@ async function pageSearch(params) {
 }
 
 // ---------------------------------------------------------------- router & boot
+// Renders are async; two overlapping ones (e.g. snapshot change + hash change) would write into
+// each other's DOM. Run one at a time and re-run once at the end if another was requested.
+let routing = false, rerouteRequested = false;
 async function route() {
+  if (routing) { rerouteRequested = true; return; }
+  routing = true;
+  try {
+    do { rerouteRequested = false; await renderPage(); } while (rerouteRequested);
+  } finally {
+    routing = false;
+  }
+}
+
+async function renderPage() {
   const { page, arg, params } = parseHash();
   const navFor = page.startsWith("device") ? "inventory" : page;
   document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("active", a.dataset.nav === navFor));

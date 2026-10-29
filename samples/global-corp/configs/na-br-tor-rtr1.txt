@@ -1,0 +1,151 @@
+!
+! Last configuration change at 09:14:22 UTC Tue Oct 27 2026 by netadmin
+! NVRAM config last updated at 09:14:25 UTC Tue Oct 27 2026 by netadmin
+!
+version 17.9
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no service pad
+platform punt-keepalive disable-kernel-core
+!
+hostname na-br-tor-rtr1
+!
+boot-start-marker
+boot system bootflash:packages.conf
+boot-end-marker
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 64000 informational
+no logging console
+enable secret 9 $9$REDACTED$REDACTED
+!
+aaa new-model
+!
+aaa group server tacacs+ ISE
+ server name ISE-1
+ ip vrf forwarding Mgmt-intf
+!
+aaa authentication login default group ISE local
+aaa authorization exec default group ISE local
+aaa accounting commands 15 default start-stop group ISE
+!
+aaa session-id common
+clock timezone EST -5 0
+!
+ip domain name globalcorp.example
+no ip domain lookup
+ip name-server 10.1.40.10 10.33.40.10
+!
+login on-success log
+!
+username netadmin privilege 15 secret 9 $9$REDACTED$REDACTED
+!
+redundancy
+ mode sso
+!
+interface Loopback0
+ description ROUTER-ID
+ ip address 10.255.1.32 255.255.255.255
+!
+interface GigabitEthernet0/0/0
+ description WAN-TO-NA-DC1
+ ip address 172.16.20.3 255.255.255.254
+ ip ospf network point-to-point
+ negotiation auto
+!
+interface GigabitEthernet0/0/1.10
+ description USERS
+ encapsulation dot1Q 10
+ ip address 10.3.2.1 255.255.255.0
+!
+interface GigabitEthernet0/0/1.20
+ description VOICE
+ encapsulation dot1Q 20
+ ip address 10.3.102.1 255.255.255.0
+!
+interface GigabitEthernet0
+ description OOB-MGMT
+ vrf forwarding Mgmt-intf
+ ip address 192.168.11.32 255.255.255.0
+ negotiation auto
+!
+router ospf 1
+ router-id 10.255.1.32
+ passive-interface default
+ no passive-interface GigabitEthernet0/0/0
+ network 10.255.1.32 0.0.0.0 area 0
+ network 172.16.20.2 0.0.0.1 area 0
+!
+router bgp 65102
+ bgp router-id 10.255.1.32
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 172.16.20.2 remote-as 65010
+ neighbor 172.16.20.2 description na-dc1-wan2
+ !
+ address-family ipv4
+  network 10.255.1.32 mask 255.255.255.255
+  network 10.3.2.0 mask 255.255.255.0
+  network 10.3.102.0 mask 255.255.255.0
+  neighbor 172.16.20.2 activate
+  neighbor 172.16.20.2 send-community both
+  neighbor 172.16.20.2 soft-reconfiguration inbound
+  maximum-paths 2
+ exit-address-family
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 192.168.11.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard VTY-ACCESS
+ 10 permit 10.1.40.0 0.0.0.255
+ 20 permit 10.33.40.0 0.0.0.255
+ 30 permit 192.168.0.0 0.0.255.255
+ 40 deny   any log
+!
+route-map OSPF-TO-BGP permit 10
+ match ip address prefix-list CORP-AGGREGATES
+!
+route-map BGP-TO-OSPF permit 10
+!
+ip prefix-list CORP-AGGREGATES seq 5 permit 10.0.0.0/8 le 32
+!
+logging source-interface GigabitEthernet0 vrf Mgmt-intf
+logging host 10.1.40.20
+logging host 10.33.40.20
+!
+snmp-server community REDACTED RO VTY-ACCESS
+snmp-server location NA-BR Toronto
+snmp-server contact noc@globalcorp.example
+snmp-server enable traps
+!
+tacacs server ISE-1
+ address ipv4 10.1.40.15
+ key 7 REDACTED
+!
+banner motd ^C
+*** na-br-tor-rtr1 - GlobalCorp NA - authorized access only ***
+^C
+!
+line con 0
+ exec-timeout 10 0
+ stopbits 1
+line vty 0 15
+ access-class VTY-ACCESS in vrf-also
+ exec-timeout 15 0
+ transport input ssh
+!
+ntp server 10.1.40.12
+ntp server 10.33.40.12
+!
+end

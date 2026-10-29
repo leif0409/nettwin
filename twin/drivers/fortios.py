@@ -67,6 +67,7 @@ class FortiOSDriver(Driver):
                 name=name, ip=ip, zone=zone_of.get(name, name),
                 enabled=i.get("status", ["up"])[0] != "down",
                 description=" ".join(i.get("alias", [])),
+                vrf="management" if i.get("dedicated-to", [""])[0] == "management" else "default",
             ))
 
         routes = []
@@ -102,8 +103,11 @@ class FortiOSDriver(Driver):
                 if f"{proto}-portrange" in s:
                     ranges = parse_ports(" ".join(s[f"{proto}-portrange"]))
                     entries.append(ServiceEntry(protocol=proto, ports=[PortRange(start=a, end=b) for a, b in ranges]))
-            if s.get("protocol", [""])[0] == "ICMP":
+            proto = s.get("protocol", [""])[0]
+            if proto == "ICMP":
                 entries.append(ServiceEntry(protocol="icmp"))
+            elif proto == "IP" and s.get("protocol-number", ["0"])[0] == "0":
+                entries.append(ServiceEntry(protocol="any"))  # how full configs define the predefined ALL
             raw_svcs[name] = entries
         svc_groups = {n: g.get("member", []) for n, g in tree.get("firewall service group", {}).items()}
 

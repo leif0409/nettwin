@@ -1,0 +1,43 @@
+## Last commit: 2026-10-27 09:14:22 CET by netadmin
+set version 22.4R3-S2.11
+set system host-name eu-br-mad-rtr1
+set system domain-name globalcorp.example
+set system time-zone Europe/Madrid
+set system root-authentication encrypted-password "$6$REDACTED"
+set system login user netadmin class super-user authentication encrypted-password "$6$REDACTED"
+set system services ssh root-login deny
+set system services netconf ssh
+set system syslog host 10.33.40.20 any notice
+set system ntp server 10.33.40.12
+set system name-server 10.33.40.10
+set system management-instance
+set security forwarding-options family mpls mode packet-based
+set interfaces lo0 description "ROUTER-ID"
+set interfaces lo0 unit 0 family inet address 10.255.2.32/32
+set interfaces ge-0/0/0 description "WAN-TO-EU-DC1"
+set interfaces ge-0/0/0 unit 0 family inet address 172.17.20.3/31
+set interfaces ge-0/0/1 description "USERS"
+set interfaces ge-0/0/1 unit 0 family inet address 10.35.2.1/24
+set interfaces fxp0 description "OOB-MGMT"
+set interfaces fxp0 unit 0 family inet address 192.168.21.32/24
+set routing-options router-id 10.255.2.32
+set routing-options autonomous-system 65202
+set routing-options forwarding-table export ECMP
+set routing-instances mgmt_junos routing-options static route 0.0.0.0/0 next-hop 192.168.21.1
+set policy-options policy-statement ECMP then load-balance per-packet
+set policy-options prefix-list CORP 10.0.0.0/8
+set policy-options policy-statement EXPORT-LAN term LAN from route-filter 10.35.20.0/24 exact
+set policy-options policy-statement EXPORT-LAN term LAN then accept
+set policy-options policy-statement EXPORT-LAN term LO from route-filter 10.255.2.32/32 exact
+set policy-options policy-statement EXPORT-LAN term LO then accept
+set policy-options policy-statement EXPORT-LAN then reject
+set protocols bgp group EU-DC1 type external
+set protocols bgp group EU-DC1 neighbor 172.17.20.2 peer-as 65020
+set protocols bgp group EU-DC1 neighbor 172.17.20.2 description "eu-dc1-wan2"
+set protocols bgp group EU-DC1 export EXPORT-LAN
+set firewall family inet filter PROTECT-RE term SSH from source-prefix-list MGMT-NETS
+set firewall family inet filter PROTECT-RE term SSH from protocol tcp
+set firewall family inet filter PROTECT-RE term SSH from destination-port ssh
+set firewall family inet filter PROTECT-RE term SSH then accept
+set snmp community REDACTED authorization read-only
+set snmp location "EU-BR Madrid"

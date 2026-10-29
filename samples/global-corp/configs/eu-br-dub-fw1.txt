@@ -1,0 +1,117 @@
+#config-version=FG100F-7.2.8-FW-build1639-240313:opmode=0:vdom=0:user=netadmin
+#conf_file_ver=2961847503125
+#buildno=1639
+#global_vdom=1
+config system global
+    set admin-sport 8443
+    set alias "FG-100F"
+    set hostname "eu-br-dub-fw1"
+    set timezone 26
+    set admintimeout 15
+end
+config system interface
+    edit "wan1"
+        set vdom "root"
+        set ip 172.17.20.5 255.255.255.254
+        set allowaccess ping
+        set type physical
+        set alias "WAN-TO-EU-DC1"
+        set role wan
+        set snmp-index 1
+    next
+    edit "internal"
+        set vdom "root"
+        set ip 10.35.3.1 255.255.255.0
+        set allowaccess ping
+        set type physical
+        set alias "USERS"
+        set role lan
+        set snmp-index 2
+    next
+end
+config firewall address
+    edit "all"
+        set uuid 334dd931-ac4e-57f1-9677-177af975ea8e
+    next
+end
+config firewall service custom
+    edit "ALL"
+        set category "General"
+        set protocol IP
+    next
+    edit "PING"
+        set category "Network Services"
+        set protocol ICMP
+        unset icmptype
+    next
+    edit "HTTP"
+        set category "Web Access"
+        set tcp-portrange 80
+    next
+    edit "HTTPS"
+        set category "Web Access"
+        set tcp-portrange 443
+    next
+    edit "DNS"
+        set category "General"
+        set tcp-portrange 53
+        set udp-portrange 53
+    next
+    edit "NTP"
+        set category "General"
+        set udp-portrange 123
+    next
+    edit "SSH"
+        set category "General"
+        set tcp-portrange 22
+    next
+    edit "RDP"
+        set category "General"
+        set tcp-portrange 3389
+    next
+    edit "SNMP"
+        set category "General"
+        set udp-portrange 161-162
+    next
+    edit "SIP"
+        set category "General"
+        set udp-portrange 5060
+    next
+    edit "RTP"
+        set category "General"
+        set udp-portrange 16384-32767
+    next
+    edit "APP-8443"
+        set category "General"
+        set tcp-portrange 8443
+    next
+    edit "PRINTER-9100"
+        set category "General"
+        set tcp-portrange 9100
+    next
+end
+config firewall policy
+    edit 1
+        set name "lan-to-wan"
+        set uuid ddd46d2f-0af7-56c0-baea-6dbc432b19c2
+        set srcintf "internal"
+        set dstintf "wan1"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+    next
+end
+config router static
+    edit 1
+        set gateway 172.17.20.4
+        set device "wan1"
+        set comment "default"
+    next
+end
+config log syslogd setting
+    set status enable
+    set server "10.33.40.20"
+end

@@ -63,6 +63,8 @@ class JunosDriver(Driver):
                 ip=u.get("ip"),
                 enabled=u.get("enabled", True) and u["phys"] not in disabled_phys,
                 description=descriptions.get(u["phys"], ""),
+                # out-of-band management ports
+                vrf="management" if u["phys"] in ("fxp0", "em0", "me0") else "default",
             )
             for name, u in units.items()
         ]

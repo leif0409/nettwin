@@ -27,6 +27,13 @@ class Interface(BaseModel):
     vrf: str = "default"
     enabled: bool = True
     description: str = ""
+    # First-hop redundancy (HSRP / VRRP): the shared gateway address and this device's priority.
+    # Hosts use the vip; only the highest-priority device on the subnet forwards for them.
+    vip: IPv4Address | None = None
+    fhrp_priority: int = 100
+
+
+MANAGEMENT_VRFS = {"management", "mgmt", "mgmt-intf", "mgmt_junos"}
 
 
 class Route(BaseModel):
@@ -102,7 +109,7 @@ class Policy(BaseModel):
 class Device(BaseModel):
     name: str
     vendor: str
-    role: Literal["router", "firewall"]
+    role: Literal["router", "switch", "firewall"]
     interfaces: list[Interface] = Field(default_factory=list)
     routes: list[Route] = Field(default_factory=list)  # connected routes are derived from interfaces
     # "config": routes are the static routes in the config. "state": routes come from the

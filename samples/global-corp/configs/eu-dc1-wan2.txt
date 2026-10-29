@@ -1,0 +1,50 @@
+## Last commit: 2026-10-27 09:14:22 CET by netadmin
+set version 22.4R3-S2.11
+set system host-name eu-dc1-wan2
+set system domain-name globalcorp.example
+set system time-zone Europe/Berlin
+set system root-authentication encrypted-password "$6$REDACTED"
+set system login user netadmin class super-user authentication encrypted-password "$6$REDACTED"
+set system services ssh root-login deny
+set system services netconf ssh
+set system syslog host 10.33.40.20 any notice
+set system ntp server 10.33.40.12
+set system name-server 10.33.40.10
+set system management-instance
+set interfaces lo0 description "ROUTER-ID"
+set interfaces lo0 unit 0 family inet address 10.255.2.2/32
+set interfaces xe-0/1/2 description "to eu-dc1-wan1 xe-0/1/2.0"
+set interfaces xe-0/1/2 unit 0 family inet address 172.17.0.1/31
+set interfaces xe-0/1/0 description "EU-DC1-TRANSIT"
+set interfaces xe-0/1/0 unit 0 family inet address 172.17.1.2/29
+set interfaces fxp0 description "OOB-MGMT"
+set interfaces fxp0 unit 0 family inet address 192.168.21.12/24
+set interfaces xe-0/1/4 description "to eu-hq-fw1 ethernet1/2"
+set interfaces xe-0/1/4 unit 0 family inet address 172.17.10.2/31
+set interfaces ge-0/0/1 description "BR-MAD-MPLS-CKT"
+set interfaces ge-0/0/1 unit 0 family inet address 172.17.20.2/31
+set interfaces et-0/0/0 description "DCI-TO-NA-DC1-WAN2 (ATL-FRA-02)"
+set interfaces et-0/0/0 unit 0 family inet address 172.18.0.3/31
+set routing-options router-id 10.255.2.2
+set routing-options autonomous-system 65020
+set routing-options forwarding-table export ECMP
+set routing-instances mgmt_junos routing-options static route 0.0.0.0/0 next-hop 192.168.21.1
+set policy-options policy-statement ECMP then load-balance per-packet
+set policy-options prefix-list CORP 10.0.0.0/8
+set protocols bgp group BRANCHES type external
+set protocols bgp group BRANCHES neighbor 172.17.20.3 peer-as 65202
+set protocols bgp group BRANCHES neighbor 172.17.20.3 description "eu-br-mad-rtr1"
+set protocols bgp group DCI-NA type external
+set protocols bgp group DCI-NA neighbor 172.18.0.2 peer-as 65010
+set protocols bgp group DCI-NA neighbor 172.18.0.2 description "na-dc1-wan2"
+set protocols ospf area 0.0.0.0 interface xe-0/1/2.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface xe-0/1/4.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface et-0/0/0.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set firewall family inet filter PROTECT-RE term SSH from source-prefix-list MGMT-NETS
+set firewall family inet filter PROTECT-RE term SSH from protocol tcp
+set firewall family inet filter PROTECT-RE term SSH from destination-port ssh
+set firewall family inet filter PROTECT-RE term SSH then accept
+set snmp community REDACTED authorization read-only
+set snmp location "EU-DC1 Frankfurt"

@@ -1,10 +1,12 @@
 from twin.drivers.base import Driver, RuleRequest
-from twin.drivers.cisco_ios import CiscoIOSDriver
+from twin.drivers.cisco_ios import CiscoIOSDriver, CiscoNXOSDriver
 from twin.drivers.fortios import FortiOSDriver
 from twin.drivers.junos import JunosDriver
 from twin.drivers.panos import PanOSDriver
 
-DRIVERS: dict[str, Driver] = {d.vendor: d for d in (CiscoIOSDriver(), JunosDriver(), PanOSDriver(), FortiOSDriver())}
+DRIVERS: dict[str, Driver] = {
+    d.vendor: d for d in (CiscoIOSDriver(), CiscoNXOSDriver(), JunosDriver(), PanOSDriver(), FortiOSDriver())
+}
 
 
 def get_driver(vendor: str) -> Driver:

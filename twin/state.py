@@ -8,6 +8,8 @@ derived from interfaces.
 Supported formats:
 - Cisco IOS / IOS-XE `show ip route` (also FortiOS `get router info routing-table all`,
   which uses the same layout)
+- Cisco NX-OS `show ip route [vrf all]`
+- Juniper `show route | display json`
 - PAN-OS `show routing route`
 """
 from __future__ import annotations
@@ -22,7 +24,8 @@ IP = r"\d{1,3}(?:\.\d{1,3}){3}"
 IOS_PROTOCOL = {"S": "static", "O": "ospf", "B": "bgp", "D": "eigrp", "R": "rip", "i": "isis"}
 SKIP_CODES = {"C", "L"}  # connected and local come from interfaces
 
-IOS_ENTRY = re.compile(rf"^(?P<code>[A-Za-z]{{1,2}}\*?(?: [A-Za-z][A-Za-z0-9]?\*?)?)\s+(?P<ip>{IP})(?:/(?P<len>\d+))?(?P<rest>.*)$")
+# Codes: "C", "B*", "O IA", "O E2", and the no-space default forms "O*E2", "O*IA", "D*EX".
+IOS_ENTRY = re.compile(rf"^(?P<code>[A-Za-z]{{1,2}}\*?(?:\s?(?:IA|E1|E2|N1|N2|EX|L1|L2|ia|su))?)\s+(?P<ip>{IP})(?:/(?P<len>\d+))?(?P<rest>.*)$")
 IOS_CONT = re.compile(r"^\s+\[\d+/\d+\]\s+via\s")
 IOS_SUBNETTED = re.compile(rf"^\s+{IP}/(?P<len>\d+) is subnetted")
 IOS_VARIABLY = re.compile(rf"^\s+{IP}/\d+ is variably subnetted")
@@ -40,7 +43,84 @@ class ParsedRoutes:
 def parse_routes(text: str) -> ParsedRoutes:
     if "VIRTUAL ROUTER" in text or "flags: A:active" in text:
         return parse_panos_routes(text)
+    if "ubest/mbest" in text:
+        return parse_nxos_routes(text)
+    if text.lstrip().startswith("{") and "route-information" in text:
+        return parse_junos_json_routes(text)
     return parse_ios_routes(text)
+
+
+# ---- NX-OS `show ip route [vrf all]` ----------------------------------------
+
+NXOS_VRF = re.compile(r'^IP Route Table for VRF "(?P<vrf>[^"]+)"')
+NXOS_PREFIX = re.compile(rf"^(?P<prefix>{IP}/\d+), ubest/mbest:")
+NXOS_VIA = re.compile(rf"^\s+\*via (?P<nh>{IP})(?:%[\w-]+)?, (?:(?P<iface>[A-Za-z][\w/.:-]*), )?\[(?P<ad>\d+)/\d+\], [^,]+, (?P<proto>[\w-]+)")
+NXOS_SKIP = {"direct", "local", "hsrp", "vrrp", "glbp", "am"}
+
+
+def parse_nxos_routes(text: str) -> ParsedRoutes:
+    out = ParsedRoutes()
+    vrf, prefix = "default", None
+    for line in text.splitlines():
+        if m := NXOS_VRF.match(line):
+            vrf, prefix = m["vrf"], None
+        elif m := NXOS_PREFIX.match(line):
+            prefix = IPv4Network(m["prefix"], strict=False)
+        elif prefix is not None and (m := NXOS_VIA.match(line)):
+            proto = m["proto"].split("-")[0]
+            if proto in NXOS_SKIP:
+                continue
+            if m["iface"] and m["iface"].lower().startswith("null"):
+                out.skipped.append(f"{prefix} ({proto} discard)")
+                continue
+            out.routes.append(Route(prefix=prefix, next_hop=m["nh"], interface=m["iface"],
+                                    protocol=proto if proto in ("static", "ospf", "bgp", "eigrp", "rip", "isis") else "other",
+                                    admin_distance=int(m["ad"]), vrf=vrf))
+    return out
+
+
+# ---- Junos `show route | display json` ---------------------------------------
+
+JUNOS_PROTOCOL = {"Static": "static", "OSPF": "ospf", "OSPF3": "ospf", "BGP": "bgp", "RIP": "rip", "IS-IS": "isis"}
+
+
+def parse_junos_json_routes(text: str) -> ParsedRoutes:
+    import json
+
+    def val(node: dict, key: str, default=None):
+        items = node.get(key) or []
+        return items[0].get("data", default) if items else default
+
+    out = ParsedRoutes()
+    # Captured CLI output often carries the prompt after the JSON (e.g. "{master:0}"):
+    # decode the first complete JSON document and ignore the rest.
+    doc, _ = json.JSONDecoder().raw_decode(text[text.index("{"):])
+    for info in doc.get("route-information", []):
+        for table in info.get("route-table", []):
+            name = val(table, "table-name", "")
+            if not name.endswith("inet.0"):
+                continue  # IPv4 unicast tables only (inet.0 and <instance>.inet.0)
+            vrf = "default" if name == "inet.0" else name.rsplit(".inet.0", 1)[0]
+            for rt in table.get("rt", []):
+                prefix = IPv4Network(val(rt, "rt-destination"), strict=False)
+                for entry in rt.get("rt-entry", []):
+                    if val(entry, "active-tag") not in ("*", "+"):
+                        continue
+                    proto_name = val(entry, "protocol-name", "")
+                    if proto_name in ("Direct", "Local", "Access-internal"):
+                        continue
+                    hops = [nh for nh in entry.get("nh", []) if "selected-next-hop" in nh] or entry.get("nh", [])[:1]
+                    if not hops:
+                        out.skipped.append(f"{prefix} ({proto_name} discard/reject)")
+                    for nh in hops:
+                        to, via = val(nh, "to"), val(nh, "via")
+                        if to is None and via is None:
+                            out.skipped.append(f"{prefix} ({proto_name} {val(nh, 'nh-type', 'no next hop')})")
+                            continue
+                        out.routes.append(Route(prefix=prefix, next_hop=to, interface=via,
+                                                protocol=JUNOS_PROTOCOL.get(proto_name, "other"),
+                                                admin_distance=int(val(entry, "preference", 0)), vrf=vrf))
+    return out
 
 
 def _classful(ip: str) -> int:

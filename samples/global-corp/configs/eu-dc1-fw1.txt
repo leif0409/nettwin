@@ -1,0 +1,840 @@
+#config-version=FG3000-7.2.8-FW-build1639-240313:opmode=0:vdom=0:user=netadmin
+#conf_file_ver=2961847503125
+#buildno=1639
+#global_vdom=1
+config system global
+    set admin-sport 8443
+    set alias "FG-3000F"
+    set hostname "eu-dc1-fw1"
+    set timezone 26
+    set admintimeout 15
+end
+config system interface
+    edit "port1"
+        set vdom "root"
+        set ip 172.17.1.3 255.255.255.248
+        set allowaccess ping
+        set type physical
+        set alias "EU-DC1-TRANSIT"
+        set role wan
+        set snmp-index 1
+    next
+    edit "port2"
+        set vdom "root"
+        set ip 172.17.1.9 255.255.255.248
+        set allowaccess ping
+        set type physical
+        set alias "EU-DC1-FW-INSIDE"
+        set role lan
+        set snmp-index 2
+    next
+    edit "mgmt"
+        set vdom "root"
+        set ip 192.168.22.11 255.255.255.0
+        set allowaccess ping https ssh snmp
+        set dedicated-to management
+        set snmp-index 3
+    next
+end
+config system zone
+    edit "wan"
+        set intrazone deny
+        set interface "port1"
+    next
+    edit "dc"
+        set intrazone deny
+        set interface "port2"
+    next
+end
+config firewall address
+    edit "all"
+        set uuid eca1d39f-a6ae-563b-95be-5f8ad17372c0
+    next
+    edit "corp-na"
+        set uuid 659705e0-9b19-5a10-9a6b-21287deb1a5e
+        set subnet 10.0.0.0 255.240.0.0
+    next
+    edit "eu-br-dub"
+        set uuid 8c6da758-23db-57bb-8217-8d946edc3a1e
+        set subnet 10.35.3.0 255.255.255.0
+    next
+    edit "eu-br-mad"
+        set uuid f6aa53aa-c14c-51c3-9e06-3dfd43e550fc
+        set subnet 10.35.2.0 255.255.255.0
+    next
+    edit "eu-br-par"
+        set uuid d86726d1-99e1-53dd-b8d4-e4f834922602
+        set subnet 10.35.1.0 255.255.255.0
+    next
+    edit "eu-dc-app"
+        set uuid 2899bd68-80c3-5e83-a981-bf52d1c0e6fe
+        set subnet 10.33.20.0 255.255.255.0
+    next
+    edit "eu-dc-db"
+        set uuid e2519ddf-49a6-50d1-bf50-bdc9e7e99f2a
+        set subnet 10.33.30.0 255.255.255.0
+    next
+    edit "eu-dc-infra"
+        set uuid d5755865-26f9-59c3-ab18-35541fe6c742
+        set subnet 10.33.40.0 255.255.255.0
+    next
+    edit "eu-dc-web"
+        set uuid a87e4003-637f-5687-a66e-e2237ff14aa9
+        set subnet 10.33.10.0 255.255.255.0
+    next
+    edit "eu-hq-it"
+        set uuid 52c9f5d5-df58-5a30-8ad6-6848d3ec5184
+        set subnet 10.34.50.0 255.255.255.0
+    next
+    edit "eu-hq-users"
+        set uuid a1834831-6068-5096-83fb-4d5d57e9664f
+        set subnet 10.34.10.0 255.255.255.0
+    next
+    edit "na-dc-nms"
+        set uuid 9c5acad1-d074-5239-b485-48bd86df1b7b
+        set subnet 10.1.40.30 255.255.255.255
+    next
+    edit "na-hq-users"
+        set uuid 894ad8a6-7992-5af3-a1e0-2ce3e98cf793
+        set subnet 10.2.10.0 255.255.255.0
+    next
+end
+config firewall addrgrp
+    edit "eu-branches"
+        set uuid 67f2febc-d75e-5628-9d62-07eca603c6b0
+        set member "eu-br-par" "eu-br-mad" "eu-br-dub"
+    next
+end
+config firewall service custom
+    edit "ALL"
+        set category "General"
+        set protocol IP
+    next
+    edit "PING"
+        set category "Network Services"
+        set protocol ICMP
+        unset icmptype
+    next
+    edit "HTTP"
+        set category "Web Access"
+        set tcp-portrange 80
+    next
+    edit "HTTPS"
+        set category "Web Access"
+        set tcp-portrange 443
+    next
+    edit "DNS"
+        set category "General"
+        set tcp-portrange 53
+        set udp-portrange 53
+    next
+    edit "NTP"
+        set category "General"
+        set udp-portrange 123
+    next
+    edit "SSH"
+        set category "General"
+        set tcp-portrange 22
+    next
+    edit "RDP"
+        set category "General"
+        set tcp-portrange 3389
+    next
+    edit "SNMP"
+        set category "General"
+        set udp-portrange 161-162
+    next
+    edit "SIP"
+        set category "General"
+        set udp-portrange 5060
+    next
+    edit "RTP"
+        set category "General"
+        set udp-portrange 16384-32767
+    next
+    edit "APP-8443"
+        set category "General"
+        set tcp-portrange 8443
+    next
+    edit "PRINTER-9100"
+        set category "General"
+        set tcp-portrange 9100
+    next
+end
+config firewall policy
+    edit 1
+        set name "gdpr-na-to-db-deny"
+        set uuid 5ba7068b-131c-5b72-913e-7a816ee03611
+        set srcintf "wan"
+        set dstintf "dc"
+        set srcaddr "corp-na"
+        set dstaddr "eu-dc-db"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "Data residency: no NA access to EU customer DB"
+    next
+    edit 2
+        set name "users-to-web"
+        set uuid 5e9d941e-468e-5607-8e4a-991523873610
+        set srcintf "wan"
+        set dstintf "dc"
+        set action accept
+        set srcaddr "eu-hq-users" "eu-branches" "corp-na"
+        set dstaddr "eu-dc-web"
+        set schedule "always"
+        set service "HTTPS"
+        set logtraffic all
+    next
+    edit 3
+        set name "eu-users-to-app"
+        set uuid 2078a9fa-8f29-5311-ab70-c66c0026af8f
+        set srcintf "wan"
+        set dstintf "dc"
+        set action accept
+        set srcaddr "eu-hq-users" "eu-branches"
+        set dstaddr "eu-dc-app"
+        set schedule "always"
+        set service "HTTPS" "APP-8443"
+        set logtraffic all
+    next
+    edit 4
+        set name "na-users-to-app"
+        set uuid f228df7e-28d4-537b-83aa-a894a53bb391
+        set srcintf "wan"
+        set dstintf "dc"
+        set action accept
+        set srcaddr "na-hq-users"
+        set dstaddr "eu-dc-app"
+        set schedule "always"
+        set service "HTTPS"
+        set logtraffic all
+    next
+    edit 5
+        set name "nms-snmp"
+        set uuid e4f35a13-e143-5065-a708-ac10e958e097
+        set srcintf "wan"
+        set dstintf "dc"
+        set action accept
+        set srcaddr "na-dc-nms"
+        set dstaddr "eu-dc-infra"
+        set schedule "always"
+        set service "SNMP"
+        set logtraffic all
+    next
+    edit 6
+        set name "it-to-infra"
+        set uuid cb3293d4-a7e0-532c-bc50-8a3ff6a0d478
+        set srcintf "wan"
+        set dstintf "dc"
+        set action accept
+        set srcaddr "eu-hq-it"
+        set dstaddr "eu-dc-infra"
+        set schedule "always"
+        set service "SSH" "RDP"
+        set logtraffic all
+    next
+    edit 7
+        set name "dc-to-wan"
+        set uuid 0e499a75-2c25-5953-a5b2-632480d719e6
+        set srcintf "dc"
+        set dstintf "wan"
+        set action accept
+        set srcaddr "eu-dc-web" "eu-dc-app" "eu-dc-infra"
+        set dstaddr "all"
+        set schedule "always"
+        set service "HTTP" "HTTPS" "DNS" "NTP"
+        set logtraffic all
+    next
+end
+config router static
+    edit 1
+        set gateway 172.17.1.4
+        set device "port1"
+        set comment "default"
+    next
+    edit 2
+        set dst 10.1.10.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 3
+        set dst 10.1.10.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 4
+        set dst 10.1.20.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 5
+        set dst 10.1.20.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 6
+        set dst 10.1.30.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 7
+        set dst 10.1.30.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 8
+        set dst 10.1.40.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 9
+        set dst 10.1.40.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 10
+        set dst 10.1.200.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 11
+        set dst 10.1.200.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 12
+        set dst 10.2.0.0 255.255.255.248
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 13
+        set dst 10.2.0.0 255.255.255.248
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 14
+        set dst 10.2.0.8 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 15
+        set dst 10.2.0.8 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 16
+        set dst 10.2.10.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 17
+        set dst 10.2.10.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 18
+        set dst 10.2.20.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 19
+        set dst 10.2.20.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 20
+        set dst 10.2.30.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 21
+        set dst 10.2.30.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 22
+        set dst 10.2.40.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 23
+        set dst 10.2.40.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 24
+        set dst 10.2.50.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 25
+        set dst 10.2.50.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 26
+        set dst 10.2.99.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 27
+        set dst 10.2.99.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 28
+        set dst 10.3.1.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 29
+        set dst 10.3.2.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 30
+        set dst 10.3.3.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 31
+        set dst 10.3.101.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 32
+        set dst 10.3.102.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 33
+        set dst 10.3.103.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 34
+        set dst 10.33.10.0 255.255.255.0
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 35
+        set dst 10.33.10.0 255.255.255.0
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 36
+        set dst 10.33.20.0 255.255.255.0
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 37
+        set dst 10.33.20.0 255.255.255.0
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 38
+        set dst 10.33.30.0 255.255.255.0
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 39
+        set dst 10.33.30.0 255.255.255.0
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 40
+        set dst 10.33.40.0 255.255.255.0
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 41
+        set dst 10.33.40.0 255.255.255.0
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 42
+        set dst 10.34.0.0 255.255.255.248
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 43
+        set dst 10.34.0.0 255.255.255.248
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 44
+        set dst 10.34.0.8 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 45
+        set dst 10.34.0.8 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 46
+        set dst 10.34.10.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 47
+        set dst 10.34.10.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 48
+        set dst 10.34.20.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 49
+        set dst 10.34.20.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 50
+        set dst 10.34.50.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 51
+        set dst 10.34.50.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 52
+        set dst 10.34.99.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 53
+        set dst 10.34.99.0 255.255.255.0
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 54
+        set dst 10.35.1.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 55
+        set dst 10.35.3.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 56
+        set dst 10.35.101.0 255.255.255.0
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 57
+        set dst 10.255.1.1 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 58
+        set dst 10.255.1.2 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 59
+        set dst 10.255.1.3 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 60
+        set dst 10.255.1.3 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 61
+        set dst 10.255.1.4 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 62
+        set dst 10.255.1.4 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 63
+        set dst 10.255.1.11 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 64
+        set dst 10.255.1.11 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 65
+        set dst 10.255.1.12 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 66
+        set dst 10.255.1.12 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 67
+        set dst 10.255.1.14 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 68
+        set dst 10.255.1.14 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 69
+        set dst 10.255.1.21 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 70
+        set dst 10.255.1.21 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 71
+        set dst 10.255.1.22 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 72
+        set dst 10.255.1.22 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 73
+        set dst 10.255.1.31 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 74
+        set dst 10.255.1.32 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 75
+        set dst 10.255.1.33 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 76
+        set dst 10.255.2.1 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 77
+        set dst 10.255.2.2 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 78
+        set dst 10.255.2.3 255.255.255.255
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 79
+        set dst 10.255.2.4 255.255.255.255
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 80
+        set dst 10.255.2.11 255.255.255.255
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 81
+        set dst 10.255.2.11 255.255.255.255
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 82
+        set dst 10.255.2.12 255.255.255.255
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 83
+        set dst 10.255.2.12 255.255.255.255
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 84
+        set dst 10.255.2.21 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 85
+        set dst 10.255.2.21 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 86
+        set dst 10.255.2.22 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 87
+        set dst 10.255.2.22 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 88
+        set dst 10.255.2.31 255.255.255.255
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 89
+        set dst 10.255.2.32 255.255.255.255
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 90
+        set dst 172.16.0.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 91
+        set dst 172.16.0.0 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 92
+        set dst 172.16.1.0 255.255.255.240
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 93
+        set dst 172.16.1.0 255.255.255.240
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 94
+        set dst 172.16.2.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 95
+        set dst 172.16.2.0 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 96
+        set dst 172.16.3.0 255.255.255.240
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 97
+        set dst 172.16.3.0 255.255.255.240
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 98
+        set dst 172.16.10.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 99
+        set dst 172.16.10.2 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 100
+        set dst 172.16.20.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 101
+        set dst 172.16.20.2 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 102
+        set dst 172.16.20.4 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 103
+        set dst 172.17.0.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 104
+        set dst 172.17.0.0 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 105
+        set dst 172.17.2.0 255.255.255.254
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 106
+        set dst 172.17.2.0 255.255.255.254
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 107
+        set dst 172.17.3.0 255.255.255.252
+        set gateway 172.17.1.10
+        set device "port2"
+    next
+    edit 108
+        set dst 172.17.3.4 255.255.255.252
+        set gateway 172.17.1.11
+        set device "port2"
+    next
+    edit 109
+        set dst 172.17.10.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 110
+        set dst 172.17.10.2 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 111
+        set dst 172.17.20.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 112
+        set dst 172.17.20.2 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 113
+        set dst 172.17.20.4 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 114
+        set dst 172.18.0.0 255.255.255.254
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 115
+        set dst 172.18.0.2 255.255.255.254
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+    edit 116
+        set dst 203.0.113.0 255.255.255.248
+        set gateway 172.17.1.1
+        set device "port1"
+    next
+    edit 117
+        set dst 203.0.113.0 255.255.255.248
+        set gateway 172.17.1.2
+        set device "port1"
+    next
+end
+config log syslogd setting
+    set status enable
+    set server "10.33.40.20"
+end
